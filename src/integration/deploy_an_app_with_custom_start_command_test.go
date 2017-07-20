@@ -1,0 +1,32 @@
+package integration_test
+
+import (
+	"integration/cutlass"
+	"path/filepath"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+)
+
+var _ = Describe("a staticfile app with a custom start command that uses boot.sh", func() {
+	var app *cutlass.App
+	AfterEach(func() {
+		if app != nil {
+			app.Destroy()
+		}
+		app = nil
+	})
+
+	BeforeEach(func() {
+		app = cutlass.New(filepath.Join(bpDir, "cf_spec", "fixtures", "custom_start_command"))
+	})
+
+	It("runs", func() {
+		Expect(app.Push()).To(Succeed())
+		Expect(app.InstanceStates()).To(Equal([]string{"RUNNING"}))
+
+		Expect(app.Stdout.String()).To(ContainSubstring("A custom start command"))
+
+		Expect(app.GetBody("/")).To(ContainSubstring("This is an example app for Cloud Foundry that is only static HTML/JS/CSS assets."))
+	})
+})
