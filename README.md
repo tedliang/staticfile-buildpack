@@ -10,12 +10,6 @@ Official buildpack documentation can be found at [staticfile buildpack docs](htt
 
 ### Building the Buildpack
 
-1. Make sure you have fetched submodules
-
-  ```bash
-  git submodule update --init
-  ```
-
 1. Get latest buildpack dependencies
 
   ```shell
@@ -47,6 +41,13 @@ BUNDLE_GEMFILE=cf.Gemfile bundle exec buildpack-build
 ```
 
 More options can be found on Machete's [Github page](https://github.com/cloudfoundry/machete).
+
+#### TODO Cutlass
+
+```
+cd src/integration
+ginkgo -nodes 8 --flakeAttempts=2 -slowSpecThreshold 45
+```
 
 ### Contributing
 
