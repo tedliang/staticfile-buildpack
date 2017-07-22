@@ -23,7 +23,7 @@ var _ = Describe("deploy a staticfile app", func() {
 		app.SetEnv("BP_DEBUG", "1")
 	})
 
-	It("", func() {
+	FIt("", func() {
 		Expect(app.Push()).To(Succeed())
 		Expect(app.InstanceStates()).To(Equal([]string{"RUNNING"}))
 
@@ -61,6 +61,23 @@ var _ = Describe("deploy a staticfile app", func() {
 				})
 			})
 		})
+
+		By("running a task", func() {
+			// TODO
+			// skip_if_no_run_task_support_on_targeted_cf
+
+			By("exits", func() {
+				command := exec.Command("cf", "run-task", app.Name, "wc -l public/index.html")
+				_, err := command.Output()
+				Expect(err).To(BeNil())
+
+				Eventually(func() string {
+					output, err := exec.Command("cf", "tasks", app.Name).Output()
+					Expect(err).To(BeNil())
+					return string(output)
+				}, "30s").Should(MatchRegexp("SUCCEEDED.*wc.*index.html"))
+			})
+		})
 	})
 
 	PContext("with a cached buildpack", func() {
@@ -85,7 +102,7 @@ var _ = Describe("deploy a staticfile app", func() {
 		})
 	})
 
-	Context("unpackaged buildpack eg. from github", func() {
+	PContext("unpackaged buildpack eg. from github", func() {
 		// let(:buildpack) { "staticfile-unpackaged-buildpack-#{rand(1000)}" }
 		// let(:app) { Machete.deploy_app('staticfile_app', buildpack: buildpack, skip_verify_version: true) }
 		// before do
@@ -98,32 +115,13 @@ var _ = Describe("deploy a staticfile app", func() {
 		//   Open3.capture2e('cf', 'delete-buildpack', '-f', buildpack)
 		// end
 
-		PIt("runs", func() {
+		It("runs", func() {
 			// expect(app).to be_running
 			// expect(app).to have_logged(/Running go build supply/)
 			// expect(app).to have_logged(/Running go build finalize/)
 
 			// browser.visit_path('/')
 			// expect(browser).to have_body('This is an example app for Cloud Foundry that is only static HTML/JS/CSS assets.')
-		})
-	})
-
-	Context("running a task", func() {
-		BeforeEach(func() {
-			// TODO
-			// skip_if_no_run_task_support_on_targeted_cf
-		})
-
-		PIt("exits", func() {
-			// expect(app).to be_running
-
-			// Open3.capture2e('cf','run-task','staticfile_app','wc -l public/index.html')[1].success? or raise 'Could not create run task'
-			// wait_until(60) do
-			//   stdout, _ = Open3.capture2e('cf','tasks','staticfile_app')
-			//   stdout =~ /SUCCEEDED.*wc.*index.html/
-			// end
-			// stdout, _ = Open3.capture2e('cf','tasks','staticfile_app')
-			// expect(stdout).to match(/SUCCEEDED.*wc.*index.html/)
 		})
 	})
 })
