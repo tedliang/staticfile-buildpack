@@ -23,7 +23,7 @@ var _ = Describe("deploy a staticfile app", func() {
 		app.SetEnv("BP_DEBUG", "1")
 	})
 
-	FIt("", func() {
+	It("", func() {
 		Expect(app.Push()).To(Succeed())
 		Expect(app.InstanceStates()).To(Equal([]string{"RUNNING"}))
 
