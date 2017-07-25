@@ -18,6 +18,7 @@ import (
 
 var DefaultMemory string = ""
 var DefaultDisk string = ""
+var Cached bool = false
 
 type cfConfig struct {
 	SpaceFields struct {
@@ -52,6 +53,21 @@ func New(fixture string) *App {
 		appGUID:   "",
 		env:       map[string]string{},
 	}
+}
+
+func ApiVersion() (string, error) {
+	cmd := exec.Command("cf", "curl", "/v2/info")
+	bytes, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
+	var info struct {
+		ApiVersion string `json:"api_version"`
+	}
+	if err := json.Unmarshal(bytes, &info); err != nil {
+		return "", err
+	}
+	return info.ApiVersion, nil
 }
 
 func DeleteOrphanedRoutes() error {

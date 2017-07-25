@@ -1,6 +1,7 @@
 package integration_test
 
 import (
+	"fmt"
 	"integration/cutlass"
 	"os/exec"
 	"path/filepath"
@@ -62,29 +63,46 @@ var _ = Describe("deploy a staticfile app", func() {
 			})
 		})
 
-		By("running a task", func() {
-			// TODO
-			// skip_if_no_run_task_support_on_targeted_cf
+		fmt.Println("Before task")
 
-			By("exits", func() {
-				command := exec.Command("cf", "run-task", app.Name, "wc -l public/index.html")
-				_, err := command.Output()
-				Expect(err).To(BeNil())
-
-				Eventually(func() string {
-					output, err := exec.Command("cf", "tasks", app.Name).Output()
+		apiVersion, err := cutlass.ApiVersion()
+		Expect(err).To(BeNil())
+		fmt.Println(apiVersion)
+		if apiVersion != "2.75.0" {
+			By("running a task", func() {
+				By("exits", func() {
+					command := exec.Command("cf", "run-task", app.Name, "wc -l public/index.html")
+					_, err := command.Output()
 					Expect(err).To(BeNil())
-					return string(output)
-				}, "30s").Should(MatchRegexp("SUCCEEDED.*wc.*index.html"))
+
+					Eventually(func() string {
+						output, err := exec.Command("cf", "tasks", app.Name).Output()
+						Expect(err).To(BeNil())
+						return string(output)
+					}, "30s").Should(MatchRegexp("SUCCEEDED.*wc.*index.html"))
+				})
 			})
-		})
+		}
+
+		fmt.Println("After task")
+
+		if cutlass.Cached {
+			By("with a cached buildpack", func() {
+				By("logs the files it downloads", func() {
+					Expect(app.Stdout.String()).To(ContainSubstring("Copy [/"))
+				})
+			})
+		} else {
+			By("with a uncached buildpack", func() {
+				By("logs the files it downloads", func() {
+					Expect(app.Stdout.String()).To(ContainSubstring("Download [https://"))
+				})
+			})
+		}
 	})
 
 	PContext("with a cached buildpack", func() {
 		// TODO :cached do
-		It("logs the files it downloads", func() {
-			// expect(app).to have_logged(/Copy \[\/.*\]/)
-		})
 
 		It("does not call out over the internet", func() {
 			// expect(app).to_not have_internet_traffic
@@ -93,9 +111,6 @@ var _ = Describe("deploy a staticfile app", func() {
 
 	PContext("with a uncached buildpack", func() {
 		// TODO :uncached do
-		It("logs the files it downloads", func() {
-			// expect(app).to have_logged(/Download \[https:\/\/.*\]/)
-		})
 
 		It("uses a proxy during staging if present", func() {
 			// expect(app).to use_proxy_during_staging
