@@ -19,7 +19,7 @@ var _ = Describe("deploy a staticfile app", func() {
 	})
 
 	BeforeEach(func() {
-		app = cutlass.New(filepath.Join(bpDir, "cf_spec", "fixtures", "staticfile_app"))
+		app = cutlass.New(filepath.Join(bpDir, "fixtures", "staticfile_app"))
 		app.SetEnv("BP_DEBUG", "1")
 	})
 

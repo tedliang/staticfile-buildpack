@@ -5,18 +5,18 @@ default_versions:
   version: 1.13.3
 exclude_files:
 - ".git/"
+- ".bin/"
+- ".bundle/"
 - ".gitignore"
-- ".gitmodules"
-- ".rspec"
-- cf_spec/
+- ".envrc"
+- fixtures/
 - log/
 - test/
 - buildpack-packager/
 - staticfile_buildpack-*v*.zip
 - pkg/
-- ".envrc"
-- cf.Gemfile
-- cf.Gemfile.lock
+- Gemfile
+- Gemfile.lock
 - scripts/
 - src/
 dependencies:

@@ -18,7 +18,7 @@ var _ = Describe("a staticfile app with a custom start command that uses boot.sh
 	})
 
 	BeforeEach(func() {
-		app = cutlass.New(filepath.Join(bpDir, "cf_spec", "fixtures", "custom_start_command"))
+		app = cutlass.New(filepath.Join(bpDir, "fixtures", "custom_start_command"))
 	})
 
 	It("runs", func() {

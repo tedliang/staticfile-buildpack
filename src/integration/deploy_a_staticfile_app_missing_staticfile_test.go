@@ -18,7 +18,7 @@ var _ = Describe("a staticfile app with no staticfile", func() {
 	})
 
 	BeforeEach(func() {
-		app = cutlass.New(filepath.Join(bpDir, "cf_spec", "fixtures", "without_staticfile"))
+		app = cutlass.New(filepath.Join(bpDir, "fixtures", "without_staticfile"))
 		app.Buildpack = "staticfile_buildpack"
 	})
 

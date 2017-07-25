@@ -18,7 +18,7 @@ var _ = Describe("deploy a staticfile app", func() {
 	})
 
 	BeforeEach(func() {
-		app = cutlass.New(filepath.Join(bpDir, "cf_spec", "fixtures", "large_page"))
+		app = cutlass.New(filepath.Join(bpDir, "fixtures", "large_page"))
 		Expect(app.Push()).To(Succeed())
 		Expect(app.InstanceStates()).To(Equal([]string{"RUNNING"}))
 	})

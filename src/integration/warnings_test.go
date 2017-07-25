@@ -18,7 +18,7 @@ var _ = Describe("deploy has nginx/conf directory", func() {
 	})
 
 	BeforeEach(func() {
-		app = cutlass.New(filepath.Join(bpDir, "cf_spec", "fixtures", "nginx_conf"))
+		app = cutlass.New(filepath.Join(bpDir, "fixtures", "nginx_conf"))
 		Expect(app.Push()).To(Succeed())
 		Expect(app.InstanceStates()).To(Equal([]string{"RUNNING"}))
 	})

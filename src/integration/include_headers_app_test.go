@@ -18,7 +18,7 @@ var _ = Describe("deploy includes headers", func() {
 	})
 
 	BeforeEach(func() {
-		app = cutlass.New(filepath.Join(bpDir, "cf_spec", "fixtures", "include_headers"))
+		app = cutlass.New(filepath.Join(bpDir, "fixtures", "include_headers"))
 		Expect(app.Push()).To(Succeed())
 		Expect(app.InstanceStates()).To(Equal([]string{"RUNNING"}))
 	})

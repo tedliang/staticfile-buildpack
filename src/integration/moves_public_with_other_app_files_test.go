@@ -18,7 +18,7 @@ var _ = Describe("pushing a static app with dummy file in root", func() {
 	})
 
 	BeforeEach(func() {
-		app = cutlass.New(filepath.Join(bpDir, "cf_spec", "fixtures", "recursive_public"))
+		app = cutlass.New(filepath.Join(bpDir, "fixtures", "recursive_public"))
 		Expect(app.Push()).To(Succeed())
 		Expect(app.InstanceStates()).To(Equal([]string{"RUNNING"}))
 	})

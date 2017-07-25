@@ -19,7 +19,7 @@ var _ = Describe("deploy a basic auth app", func() {
 	})
 
 	It("the app uses Staticfile.auth", func() {
-		app = cutlass.New(filepath.Join(bpDir, "cf_spec", "fixtures", "basic_auth"))
+		app = cutlass.New(filepath.Join(bpDir, "fixtures", "basic_auth"))
 		Expect(app.Push()).To(Succeed())
 		Expect(app.InstanceStates()).To(Equal([]string{"RUNNING"}))
 
@@ -51,7 +51,7 @@ var _ = Describe("deploy a basic auth app", func() {
 		var appDir string
 		BeforeEach(func() {
 			var err error
-			appDir, err = cutlass.CopyFixture(filepath.Join(bpDir, "cf_spec", "fixtures", "basic_auth"))
+			appDir, err = cutlass.CopyFixture(filepath.Join(bpDir, "fixtures", "basic_auth"))
 			Expect(err).To(BeNil())
 
 			Expect(os.Remove(filepath.Join(appDir, "Staticfile"))).To(Succeed())

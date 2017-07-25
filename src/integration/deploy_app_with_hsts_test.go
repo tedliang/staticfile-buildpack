@@ -18,7 +18,7 @@ var _ = Describe("deploy an app using hsts", func() {
 	})
 
 	BeforeEach(func() {
-		app = cutlass.New(filepath.Join(bpDir, "cf_spec", "fixtures", "with_hsts"))
+		app = cutlass.New(filepath.Join(bpDir, "fixtures", "with_hsts"))
 		app.SetEnv("BP_DEBUG", "1")
 	})
 

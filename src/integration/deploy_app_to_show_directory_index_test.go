@@ -18,7 +18,7 @@ var _ = Describe("deploy an app that shows the directory index", func() {
 	})
 
 	BeforeEach(func() {
-		app = cutlass.New(filepath.Join(bpDir, "cf_spec", "fixtures", "directory_index"))
+		app = cutlass.New(filepath.Join(bpDir, "fixtures", "directory_index"))
 	})
 
 	It("runs", func() {

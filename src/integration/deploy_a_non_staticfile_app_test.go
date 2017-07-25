@@ -18,7 +18,7 @@ var _ = Describe("deploy a non staticfile app", func() {
 	})
 
 	BeforeEach(func() {
-		app = cutlass.New(filepath.Join(bpDir, "cf_spec", "fixtures", "non_staticfile"))
+		app = cutlass.New(filepath.Join(bpDir, "fixtures", "non_staticfile"))
 	})
 
 	It("fails", func() {

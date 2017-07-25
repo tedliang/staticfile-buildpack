@@ -18,7 +18,7 @@ var _ = Describe("deploy an app with contents in an alternate root", func() {
 	})
 
 	BeforeEach(func() {
-		app = cutlass.New(filepath.Join(bpDir, "cf_spec", "fixtures", "alternate_root"))
+		app = cutlass.New(filepath.Join(bpDir, "fixtures", "alternate_root"))
 	})
 
 	It("succeeds", func() {
