@@ -1,7 +1,6 @@
 package integration_test
 
 import (
-	"fmt"
 	"integration/cutlass"
 	"os/exec"
 	"path/filepath"
@@ -63,11 +62,8 @@ var _ = Describe("deploy a staticfile app", func() {
 			})
 		})
 
-		fmt.Println("Before task")
-
 		apiVersion, err := cutlass.ApiVersion()
 		Expect(err).To(BeNil())
-		fmt.Println(apiVersion)
 		if apiVersion != "2.75.0" {
 			By("running a task", func() {
 				By("exits", func() {
@@ -83,8 +79,6 @@ var _ = Describe("deploy a staticfile app", func() {
 				})
 			})
 		}
-
-		fmt.Println("After task")
 
 		if cutlass.Cached {
 			By("with a cached buildpack", func() {
