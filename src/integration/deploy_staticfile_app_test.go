@@ -95,7 +95,7 @@ var _ = Describe("deploy a staticfile app", func() {
 		}
 	})
 
-	PContext("with a cached buildpack", func() {
+	FContext("with a cached buildpack", func() {
 		// TODO :cached do
 
 		It("does not call out over the internet", func() {
