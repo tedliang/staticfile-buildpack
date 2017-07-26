@@ -99,7 +99,14 @@ var _ = Describe("deploy a staticfile app", func() {
 		// TODO :cached do
 
 		It("does not call out over the internet", func() {
-			// expect(app).to_not have_internet_traffic
+			traffic, err := cutlass.InternetTraffic(
+				bpDir,
+				"fixtures/staticfile_app",
+				// "staticfile_buildpack-v1.4.11.zip",
+				"staticfile_buildpack-cached-v1.4.11.zip",
+			)
+			Expect(err).To(BeNil())
+			Expect(traffic).To(HaveLen(0))
 		})
 	})
 
