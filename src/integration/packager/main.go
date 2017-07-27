@@ -40,6 +40,12 @@ func main() {
 	flag.StringVar(&version, "version", "", "version")
 	flag.Parse()
 
+	if err := Package(dir, cacheDir, version, cached); err != nil {
+		log.Fatalf("error: %v", err)
+	}
+}
+
+func Package(dir, cacheDir, version string, cached bool) error {
 	if version == "" {
 		v, err := ioutil.ReadFile("VERSION")
 		if err != nil {
@@ -119,6 +125,8 @@ func main() {
 	}
 
 	fmt.Printf("%s buildpack created and saved as %s with a size of %dMB\n", buildpackType, zipFile, stat.Size()/1024/1024)
+
+	return nil
 }
 
 func downloadFromUrl(url, fileName string) error {
