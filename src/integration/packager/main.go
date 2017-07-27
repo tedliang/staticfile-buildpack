@@ -32,15 +32,17 @@ type File struct {
 	Name, Path string
 }
 
+var CACHE_DIR string = filepath.Join(os.Getenv("HOME"), ".buildpack-packager", "cache")
+
 func main() {
 	var cached bool
 	var cacheDir, version string
 	flag.BoolVar(&cached, "cached", false, "include dependencies")
-	flag.StringVar(&cacheDir, "cachedir", filepath.Join(os.Getenv("HOME"), ".buildpack-packager", "cache"), "cache dir")
+	flag.StringVar(&cacheDir, "cachedir", CACHE_DIR, "cache dir")
 	flag.StringVar(&version, "version", "", "version")
 	flag.Parse()
 
-	if err := Package(dir, cacheDir, version, cached); err != nil {
+	if err := Package(".", cacheDir, version, cached); err != nil {
 		log.Fatalf("error: %v", err)
 	}
 }
@@ -54,7 +56,7 @@ func Package(dir, cacheDir, version string, cached bool) error {
 		version = string(v)
 	}
 
-	dir, err := CopyDirectory(".")
+	dir, err := CopyDirectory(dir)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
