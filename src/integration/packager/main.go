@@ -6,7 +6,6 @@ import (
 	"encoding/hex"
 	"flag"
 	"fmt"
-	"integration/cutlass"
 	"io"
 	"io/ioutil"
 	"log"
@@ -49,7 +48,7 @@ func main() {
 		version = string(v)
 	}
 
-	dir, err := cutlass.CopyFixture(".")
+	dir, err := CopyDirectory(".")
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
@@ -212,4 +211,46 @@ func ZipFiles(filename string, files []File) error {
 		}
 	}
 	return nil
+}
+
+func CopyDirectory(srcDir string) (string, error) {
+	destDir, err := ioutil.TempDir("", "buildpack-packager")
+	if err != nil {
+		return "", err
+	}
+	err = filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
+		if path == ".git" {
+			return filepath.SkipDir
+		}
+
+		dest := filepath.Join(destDir, path)
+		if info.IsDir() {
+			err = os.MkdirAll(dest, info.Mode())
+			if err != nil {
+				return err
+			}
+		} else {
+			src, err := os.Open(filepath.Join(srcDir, path))
+			if err != nil {
+				return err
+			}
+			defer src.Close()
+
+			err = os.MkdirAll(filepath.Dir(dest), 0755)
+			if err != nil {
+				return err
+			}
+
+			fh, err := os.OpenFile(dest, os.O_RDWR|os.O_CREATE|os.O_TRUNC, info.Mode())
+			if err != nil {
+				return err
+			}
+
+			_, err = io.Copy(fh, src)
+			fh.Close()
+			return err
+		}
+		return nil
+	})
+	return destDir, err
 }
