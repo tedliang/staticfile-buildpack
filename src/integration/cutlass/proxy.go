@@ -26,9 +26,6 @@ func NewProxy() (*httptest.Server, error) {
 }
 
 func publicIP() (string, error) {
-	// TODO remove
-	return "172.17.0.1", nil
-
 	interfaces, err := net.Interfaces()
 	if err != nil {
 		return "", err

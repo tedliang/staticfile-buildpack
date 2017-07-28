@@ -98,8 +98,8 @@ var _ = Describe("deploy a staticfile app", func() {
 		}
 	})
 
-	if cutlass.Cached || true {
-		Context("with a cached buildpack", func() {
+	if cutlass.Cached {
+		FContext("with a cached buildpack", func() {
 			// TODO :cached do
 
 			It("does not call out over the internet", func() {
@@ -114,7 +114,7 @@ var _ = Describe("deploy a staticfile app", func() {
 			})
 		})
 	} else {
-		Context("with a uncached buildpack", func() {
+		FContext("with a uncached buildpack", func() {
 			var proxy *httptest.Server
 			BeforeEach(func() {
 				var err error
