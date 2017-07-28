@@ -2,6 +2,7 @@ package integration_test
 
 import (
 	"integration/cutlass"
+	"net/http/httptest"
 	"os/exec"
 	"path/filepath"
 
@@ -95,26 +96,40 @@ var _ = Describe("deploy a staticfile app", func() {
 		}
 	})
 
-	FContext("with a cached buildpack", func() {
+	Context("with a cached buildpack", func() {
 		// TODO :cached do
 
 		It("does not call out over the internet", func() {
 			traffic, err := cutlass.InternetTraffic(
 				bpDir,
 				"fixtures/staticfile_app",
-				// "staticfile_buildpack-v1.4.11.zip",
 				"staticfile_buildpack-cached-v1.4.11.zip",
+				[]string{},
 			)
 			Expect(err).To(BeNil())
 			Expect(traffic).To(HaveLen(0))
 		})
 	})
 
-	PContext("with a uncached buildpack", func() {
-		// TODO :uncached do
+	FContext("with a uncached buildpack", func() {
+		var proxy *httptest.Server
+		BeforeEach(func() {
+			var err error
+			proxy, err = cutlass.NewProxy()
+			Expect(err).To(BeNil())
+		})
+		AfterEach(func() { proxy.Close() })
 
 		It("uses a proxy during staging if present", func() {
-			// expect(app).to use_proxy_during_staging
+			traffic, err := cutlass.InternetTraffic(
+				bpDir,
+				"fixtures/staticfile_app",
+				"staticfile_buildpack-cached-v1.4.11.zip",
+				// "staticfile_buildpack-v1.4.11.zip",
+				[]string{"HTTP_PROXY=" + proxy.URL, "HTTPS_PROXY=" + proxy.URL},
+			)
+			Expect(err).To(BeNil())
+			Expect(traffic).To(HaveLen(0))
 		})
 	})
 

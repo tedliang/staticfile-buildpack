@@ -8,10 +8,10 @@ import (
 	"strings"
 )
 
-func InternetTraffic(bp_dir, fixture_path, buildpack_path string) ([]string, error) {
+func InternetTraffic(bp_dir, fixture_path, buildpack_path string, envs []string) ([]string, error) {
 	network_command := "(sudo /usr/sbin/tcpdump -n -i eth0 not udp port 53 and ip -c 1 -t | sed -e 's/^[^$]/internet traffic: /' 2>&1 &) && /buildpack/bin/detect /tmp/staged && /buildpack/bin/compile /tmp/staged /tmp/cache && /buildpack/bin/release /tmp/staged /tmp/cache"
 
-	output, err := executeDockerFile(bp_dir, fixture_path, buildpack_path, network_command)
+	output, err := executeDockerFile(bp_dir, fixture_path, buildpack_path, envs, network_command)
 	if err != nil {
 		return nil, err
 	}
@@ -26,11 +26,11 @@ func InternetTraffic(bp_dir, fixture_path, buildpack_path string) ([]string, err
 	return out, nil
 }
 
-func executeDockerFile(bp_dir, fixture_path, buildpack_path, network_command string) (string, error) {
+func executeDockerFile(bp_dir, fixture_path, buildpack_path string, envs []string, network_command string) (string, error) {
 	docker_image_name := "internet_traffic_test"
 
 	// docker_env_vars += get_app_env_vars(fixture_path)
-	dockerfile_contents := dockerfile(fixture_path, buildpack_path, network_command)
+	dockerfile_contents := dockerfile(fixture_path, buildpack_path, envs, network_command)
 
 	err := ioutil.WriteFile(filepath.Join(bp_dir, "itf.Dockerfile"), []byte(dockerfile_contents), 0755)
 	if err != nil {
@@ -41,17 +41,22 @@ func executeDockerFile(bp_dir, fixture_path, buildpack_path, network_command str
 
 	cmd := exec.Command("docker", "build", "--rm", "--no-cache", "-t", docker_image_name, "-f", "itf.Dockerfile", ".")
 	cmd.Dir = bp_dir
+	cmd.Stderr = os.Stderr
 	output, err := cmd.Output()
 
 	return string(output), err
 }
 
-func dockerfile(fixture_path, buildpack_path, network_command string) string {
+func dockerfile(fixture_path, buildpack_path string, envs []string, network_command string) string {
 	out := "FROM cloudfoundry/cflinuxfs2\n" +
 		"ENV CF_STACK cflinuxfs2\n" +
-		"ENV VCAP_APPLICATION {}\n" +
-		// TODO env vars
-		// "#{env_vars}\n" +
+		"ENV VCAP_APPLICATION {}\n"
+	for _, env := range envs {
+		out = out + "ENV " + env + "\n"
+	}
+	// TODO env vars
+	// "#{env_vars}\n" +
+	out = out +
 		"ADD " + fixture_path + " /tmp/staged/\n" +
 		"ADD " + buildpack_path + " /tmp/\n" +
 		"RUN mkdir -p /buildpack\n" +
