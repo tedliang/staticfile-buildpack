@@ -2,11 +2,11 @@ package cutlass
 
 import (
 	"fmt"
-	"io"
 	"net"
-	"net/http"
 	"net/http/httptest"
 	"strings"
+
+	"github.com/elazarl/goproxy"
 )
 
 func NewProxy() (*httptest.Server, error) {
@@ -14,18 +14,7 @@ func NewProxy() (*httptest.Server, error) {
 	if err != nil {
 		return nil, err
 	}
-	ts := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		url := fmt.Sprintf("https://%s%s", r.Host, r.URL)
-		resp, err := http.Get(url)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprintln(w, "ERROR", err)
-			return
-		}
-		w.WriteHeader(resp.StatusCode)
-		io.Copy(w, resp.Body)
-		resp.Body.Close()
-	}))
+	ts := httptest.NewUnstartedServer(goproxy.NewProxyHttpServer())
 	ts.Listener.Close()
 	ts.Listener, err = net.Listen("tcp", addr+":0")
 	if err != nil {
@@ -37,6 +26,9 @@ func NewProxy() (*httptest.Server, error) {
 }
 
 func publicIP() (string, error) {
+	// TODO remove
+	return "172.17.0.1", nil
+
 	interfaces, err := net.Interfaces()
 	if err != nil {
 		return "", err

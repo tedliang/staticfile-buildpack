@@ -11,7 +11,7 @@ import (
 )
 
 func InternetTraffic(bp_dir, fixture_path, buildpack_path string, envs []string) ([]string, error) {
-	network_command := "(sudo /usr/bin/tcpdump -n -i eth0 not udp port 53 and ip -c 1 -t | sed -e 's/^/internet traffic: /' 2>&1 &) && /buildpack/bin/detect /tmp/staged && /buildpack/bin/compile /tmp/staged /tmp/cache && /buildpack/bin/release /tmp/staged /tmp/cache"
+	network_command := "(sudo tcpdump -n -i eth0 not udp port 53 and ip -t -Uw /tmp/dumplog &) && /buildpack/bin/detect /tmp/staged && /buildpack/bin/compile /tmp/staged /tmp/cache && /buildpack/bin/release /tmp/staged /tmp/cache && pkill tcpdump; tcpdump -nr /tmp/dumplog | sed -e 's/^/internet traffic: /' 2>&1 || true"
 
 	output, err := executeDockerFile(bp_dir, fixture_path, buildpack_path, envs, network_command)
 	if err != nil {
@@ -28,20 +28,15 @@ func InternetTraffic(bp_dir, fixture_path, buildpack_path string, envs []string)
 	return out, nil
 }
 
-func UniqueDestination(traffic []string) []string {
-	re := regexp.MustCompile("^IP [\\d\\.]+ > ([\\d\\.]+):")
-	keys := make(map[string]bool)
+func UniqueDestination(traffic []string, destination string) error {
+	re := regexp.MustCompile("^[\\d\\.:]+ IP ([\\d\\.]+) > ([\\d\\.]+):")
 	for _, line := range traffic {
 		m := re.FindStringSubmatch(line)
-		if len(m) == 2 {
-			keys[m[1]] = true
+		if len(m) != 3 || (m[1] != destination && m[2] != destination) {
+			return fmt.Errorf("Outgoing traffic: %s", line)
 		}
 	}
-	out := make([]string, 0, len(keys))
-	for k, _ := range keys {
-		out = append(out, k)
-	}
-	return out
+	return nil
 }
 
 func executeDockerFile(bp_dir, fixture_path, buildpack_path string, envs []string, network_command string) (string, error) {
@@ -61,7 +56,6 @@ func executeDockerFile(bp_dir, fixture_path, buildpack_path string, envs []strin
 	cmd.Dir = bp_dir
 	cmd.Stderr = os.Stderr
 	output, err := cmd.Output()
-	fmt.Println(string(output))
 
 	return string(output), err
 }

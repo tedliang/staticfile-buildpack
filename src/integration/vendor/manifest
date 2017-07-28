@@ -2,6 +2,14 @@
 	"version": 0,
 	"dependencies": [
 		{
+			"importpath": "github.com/elazarl/goproxy",
+			"repository": "https://github.com/elazarl/goproxy",
+			"vcs": "git",
+			"revision": "aacba83f36a55ac31cbb71c06547a328c0cd1604",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/golang/protobuf/proto",
 			"repository": "https://github.com/golang/protobuf",
 			"vcs": "git",
@@ -17,6 +25,14 @@
 			"revision": "7b8002443fd4a3ce5f25ef93087c524546799a56",
 			"branch": "master",
 			"path": "ptypes/any",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/inconshreveable/go-vhost",
+			"repository": "https://github.com/inconshreveable/go-vhost",
+			"vcs": "git",
+			"revision": "06d84117953b22058c096b49a429ebd4f3d3d97b",
+			"branch": "master",
 			"notests": true
 		},
 		{
@@ -124,6 +140,24 @@
 			"vcs": "git",
 			"revision": "00acfa9d92a386415bd235ab069c52063f925998",
 			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/rogpeppe/go-charset/charset",
+			"repository": "https://github.com/rogpeppe/go-charset",
+			"vcs": "git",
+			"revision": "e9ff06f347d3f5d0013d59ed83754f0e88de10d4",
+			"branch": "master",
+			"path": "charset",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/rogpeppe/go-charset/data",
+			"repository": "https://github.com/rogpeppe/go-charset",
+			"vcs": "git",
+			"revision": "e9ff06f347d3f5d0013d59ed83754f0e88de10d4",
+			"branch": "master",
+			"path": "/data",
 			"notests": true
 		},
 		{
