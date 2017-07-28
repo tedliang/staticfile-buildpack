@@ -1,9 +1,10 @@
 package integration_test
 
 import (
-	"integration/cutlass"
 	"os/exec"
 	"path/filepath"
+
+	"github.com/cloudfoundry/libbuildpack/cutlass"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

@@ -2,11 +2,12 @@ package integration_test
 
 import (
 	"fmt"
-	"integration/cutlass"
 	"net/http/httptest"
 	"net/url"
 	"os/exec"
 	"path/filepath"
+
+	"github.com/cloudfoundry/libbuildpack/cutlass"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
