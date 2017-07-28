@@ -1,6 +1,7 @@
 package cutlass
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -9,7 +10,7 @@ import (
 )
 
 func InternetTraffic(bp_dir, fixture_path, buildpack_path string, envs []string) ([]string, error) {
-	network_command := "(sudo /usr/sbin/tcpdump -n -i eth0 not udp port 53 and ip -c 1 -t | sed -e 's/^[^$]/internet traffic: /' 2>&1 &) && /buildpack/bin/detect /tmp/staged && /buildpack/bin/compile /tmp/staged /tmp/cache && /buildpack/bin/release /tmp/staged /tmp/cache"
+	network_command := "(sudo /usr/bin/tcpdump -n -i eth0 not udp port 53 and ip -c 1 -t | sed -e 's/^[^$]/internet traffic: /' 2>&1 &) && /buildpack/bin/detect /tmp/staged && /buildpack/bin/compile /tmp/staged /tmp/cache && /buildpack/bin/release /tmp/staged /tmp/cache"
 
 	output, err := executeDockerFile(bp_dir, fixture_path, buildpack_path, envs, network_command)
 	if err != nil {
@@ -43,6 +44,7 @@ func executeDockerFile(bp_dir, fixture_path, buildpack_path string, envs []strin
 	cmd.Dir = bp_dir
 	cmd.Stderr = os.Stderr
 	output, err := cmd.Output()
+	fmt.Println(string(output))
 
 	return string(output), err
 }
@@ -54,8 +56,6 @@ func dockerfile(fixture_path, buildpack_path string, envs []string, network_comm
 	for _, env := range envs {
 		out = out + "ENV " + env + "\n"
 	}
-	// TODO env vars
-	// "#{env_vars}\n" +
 	out = out +
 		"ADD " + fixture_path + " /tmp/staged/\n" +
 		"ADD " + buildpack_path + " /tmp/\n" +
@@ -63,7 +63,7 @@ func dockerfile(fixture_path, buildpack_path string, envs []string, network_comm
 		"RUN mkdir -p /tmp/cache\n" +
 		"RUN unzip /tmp/" + filepath.Base(buildpack_path) + " -d /buildpack\n" +
 		"# HACK around https://github.com/dotcloud/docker/issues/5490\n" +
-		// "RUN mv /usr/sbin/tcpdump /usr/bin/tcpdump\n" +
+		"RUN mv /usr/sbin/tcpdump /usr/bin/tcpdump\n" +
 		"RUN " + network_command + "\n"
 	return out
 }
