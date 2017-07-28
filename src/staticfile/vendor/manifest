@@ -13,7 +13,7 @@
 			"importpath": "github.com/blang/semver",
 			"repository": "https://github.com/blang/semver",
 			"vcs": "git",
-			"revision": "4a1e882c79dcf4ec00d2e29fac74b9c8938d5052",
+			"revision": "2ee87856327ba09384cabd113bc6b5d174e9ec0f",
 			"branch": "master",
 			"notests": true
 		},
@@ -29,7 +29,7 @@
 			"importpath": "github.com/golang/mock/gomock",
 			"repository": "https://github.com/golang/mock",
 			"vcs": "git",
-			"revision": "dbe9dea30dbc5b4b6d54c9ecf9a3b8f9b8e6556c",
+			"revision": "13f360950a79f5864a972c786a10a50e44b69541",
 			"branch": "master",
 			"path": "/gomock",
 			"notests": true
@@ -38,7 +38,7 @@
 			"importpath": "github.com/golang/mock/mockgen",
 			"repository": "https://github.com/golang/mock",
 			"vcs": "git",
-			"revision": "dbe9dea30dbc5b4b6d54c9ecf9a3b8f9b8e6556c",
+			"revision": "13f360950a79f5864a972c786a10a50e44b69541",
 			"branch": "master",
 			"path": "/mockgen",
 			"notests": true
@@ -47,7 +47,7 @@
 			"importpath": "github.com/golang/protobuf/proto",
 			"repository": "https://github.com/golang/protobuf",
 			"vcs": "git",
-			"revision": "0a4f71a498b7c4812f64969510bcb4eca251e33a",
+			"revision": "748d386b5c1ea99658fd69fe9f03991ce86a90c1",
 			"branch": "master",
 			"path": "/proto",
 			"notests": true
@@ -56,7 +56,7 @@
 			"importpath": "github.com/golang/protobuf/ptypes/any",
 			"repository": "https://github.com/golang/protobuf",
 			"vcs": "git",
-			"revision": "0a4f71a498b7c4812f64969510bcb4eca251e33a",
+			"revision": "748d386b5c1ea99658fd69fe9f03991ce86a90c1",
 			"branch": "master",
 			"path": "ptypes/any",
 			"notests": true
@@ -65,7 +65,7 @@
 			"importpath": "github.com/onsi/ginkgo",
 			"repository": "https://github.com/onsi/ginkgo",
 			"vcs": "git",
-			"revision": "9eda700730cba42af70d53180f9dcce9266bc2bc",
+			"revision": "8382b23d18dbaaff8e5f7e83784c53ebb8ec2f47",
 			"branch": "master",
 			"notests": true
 		},
@@ -81,7 +81,7 @@
 			"importpath": "golang.org/x/net/html",
 			"repository": "https://go.googlesource.com/net",
 			"vcs": "git",
-			"revision": "02ac38e2528ff4adea90f184d71a3faa04b4b1b0",
+			"revision": "f5079bd7f6f74e23c4d65efa0f4ce14cbd6a3c0f",
 			"branch": "master",
 			"path": "html",
 			"notests": true
@@ -90,7 +90,7 @@
 			"importpath": "golang.org/x/sys/unix",
 			"repository": "https://go.googlesource.com/sys",
 			"vcs": "git",
-			"revision": "7a4fde3fda8ef580a89dbae8138c26041be14299",
+			"revision": "35ef4487ce0a1ea5d4b616ffe71e34febe723695",
 			"branch": "master",
 			"path": "/unix",
 			"notests": true
@@ -179,7 +179,7 @@
 			"importpath": "gopkg.in/yaml.v2",
 			"repository": "https://gopkg.in/yaml.v2",
 			"vcs": "git",
-			"revision": "3b4ad1db5b2a649883ff3782f5f9f6fb52be71af",
+			"revision": "25c4ec802a7d637f88d584ab26798e94ad14c13b",
 			"branch": "v2",
 			"notests": true
 		}

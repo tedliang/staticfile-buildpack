@@ -126,7 +126,8 @@ var _ = Describe("deploy a staticfile app", func() {
 					bpDir,
 					"fixtures/staticfile_app",
 					"staticfile_buildpack-v1.4.11.zip",
-					[]string{"HTTP_PROXY=" + proxy.URL, "HTTPS_PROXY=" + proxy.URL},
+					// []string{"HTTP_PROXY=" + proxy.URL, "HTTPS_PROXY=" + proxy.URL},
+					[]string{},
 				)
 				Expect(err).To(BeNil())
 				Expect(traffic).To(HaveLen(0))
