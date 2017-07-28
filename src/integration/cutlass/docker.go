@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -25,6 +26,22 @@ func InternetTraffic(bp_dir, fixture_path, buildpack_path string, envs []string)
 	}
 
 	return out, nil
+}
+
+func UniqueDestination(traffic []string) []string {
+	re := regexp.MustCompile("^IP [\\d\\.]+ > ([\\d\\.]+):")
+	keys := make(map[string]bool)
+	for _, line := range traffic {
+		m := re.FindStringSubmatch(line)
+		if len(m) == 2 {
+			keys[m[1]] = true
+		}
+	}
+	out := make([]string, 0, len(keys))
+	for k, _ := range keys {
+		out = append(out, k)
+	}
+	return out
 }
 
 func executeDockerFile(bp_dir, fixture_path, buildpack_path string, envs []string, network_command string) (string, error) {

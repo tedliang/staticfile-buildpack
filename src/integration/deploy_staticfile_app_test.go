@@ -1,8 +1,10 @@
 package integration_test
 
 import (
+	"fmt"
 	"integration/cutlass"
 	"net/http/httptest"
+	"net/url"
 	"os/exec"
 	"path/filepath"
 
@@ -130,7 +132,14 @@ var _ = Describe("deploy a staticfile app", func() {
 					[]string{},
 				)
 				Expect(err).To(BeNil())
-				Expect(traffic).To(HaveLen(0))
+
+				destUrl, err := url.Parse(proxy.URL)
+				Expect(err).To(BeNil())
+
+				destinations := cutlass.UniqueDestination(traffic)
+				Expect(destinations).To(Equal([]string{
+					fmt.Sprintf("%s.%s", destUrl.Hostname(), destUrl.Port()),
+				}))
 			})
 		})
 	}
