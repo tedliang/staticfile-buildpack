@@ -1,6 +1,7 @@
 package integration_test
 
 import (
+	"flag"
 	"io/ioutil"
 	"path/filepath"
 
@@ -14,6 +15,14 @@ import (
 
 var bpDir string
 var buildpackVersion string
+var UpdateBuildpack bool
+
+func init() {
+	flag.BoolVar(&cutlass.Cached, "cached", false, "cached buildpack")
+	flag.BoolVar(&UpdateBuildpack, "update-buildpack", true, "build buildpack and update to buildpack")
+	flag.StringVar(&cutlass.DefaultMemory, "memory", "256M", "default memory for pushed apps")
+	flag.StringVar(&cutlass.DefaultDisk, "memory", "256M", "default disk for pushed apps")
+}
 
 func TestIntegration(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -39,9 +48,6 @@ var _ = BeforeSuite(func() {
 	data, err := ioutil.ReadFile(filepath.Join(bpDir, "VERSION"))
 	Expect(err).NotTo(HaveOccurred())
 	buildpackVersion = string(data)
-
-	cutlass.DefaultMemory = "256M"
-	cutlass.DefaultDisk = "256M"
 })
 
 var _ = AfterSuite(func() {
