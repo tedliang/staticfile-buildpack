@@ -14,10 +14,16 @@
   version = "v3.5.1"
 
 [[projects]]
-  branch = "master"
+  branch = "cutlass"
   name = "github.com/cloudfoundry/libbuildpack"
-  packages = [".","ansicleaner"]
-  revision = "b60365844289826e9a4d1a4d7f79ec24e1fafa24"
+  packages = [".","ansicleaner","cutlass"]
+  revision = "1496a993c0972d2361157f5390c99218f9f0392a"
+
+[[projects]]
+  name = "github.com/elazarl/goproxy"
+  packages = ["."]
+  revision = "0a5b8bdb09049ae4ae68e75437ded0b7a2e324e3"
+  version = "v1.0"
 
 [[projects]]
   name = "github.com/golang/mock"
@@ -36,6 +42,18 @@
   packages = [".","format","internal/assertion","internal/asyncassertion","internal/oraclematcher","internal/testingtsupport","matchers","matchers/support/goraph/bipartitegraph","matchers/support/goraph/edge","matchers/support/goraph/node","matchers/support/goraph/util","types"]
   revision = "c893efa28eb45626cdaa76c9f653b62488858837"
   version = "v1.2.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/tidwall/gjson"
+  packages = ["."]
+  revision = "c784c417818f59d6597274642d8ac1d09efc9b01"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/tidwall/match"
+  packages = ["."]
+  revision = "173748da739a410c5b0b813b956f89ff94730b4c"
 
 [[projects]]
   branch = "master"
@@ -70,6 +88,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "76b15226cc5b121c234d3fd1cafa8a1f4e82fbf8e2ae50f66e231d0cfba445c7"
+  inputs-digest = "88219dd7fe8846b1e200517a2b7f5d9015bdc71cceba2a47a8ed0a4dac2f4202"
   solver-name = "gps-cdcl"
   solver-version = 1
