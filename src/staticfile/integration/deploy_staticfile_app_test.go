@@ -4,10 +4,13 @@ import (
 	"fmt"
 	"net/http/httptest"
 	"net/url"
+	"os"
 	"os/exec"
 	"path/filepath"
+	"time"
 
 	"github.com/cloudfoundry/libbuildpack/cutlass"
+	"github.com/cloudfoundry/libbuildpack/packager"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -100,14 +103,21 @@ var _ = Describe("deploy a staticfile app", func() {
 	})
 
 	if cutlass.Cached {
-		Context("with a cached buildpack", func() {
-			// TODO :cached do
+		FContext("with a cached buildpack", func() {
+			var bpFile string
+			BeforeEach(func() {
+				var err error
+				localVersion := fmt.Sprintf("%s.%s", buildpackVersion, time.Now().Format("20060102150405"))
+				bpFile, err = packager.Package(bpDir, packager.CacheDir, localVersion, true)
+				Expect(err).To(BeNil())
+			})
+			AfterEach(func() { os.Remove(bpFile) })
 
 			It("does not call out over the internet", func() {
 				traffic, err := cutlass.InternetTraffic(
 					bpDir,
 					"fixtures/staticfile_app",
-					"staticfile_buildpack-cached-v1.4.11.zip",
+					bpFile,
 					[]string{},
 				)
 				Expect(err).To(BeNil())
@@ -115,14 +125,22 @@ var _ = Describe("deploy a staticfile app", func() {
 			})
 		})
 	} else {
-		Context("with a uncached buildpack", func() {
+		FContext("with a uncached buildpack", func() {
 			var proxy *httptest.Server
+			var bpFile string
 			BeforeEach(func() {
 				var err error
+				localVersion := fmt.Sprintf("%s.%s", buildpackVersion, time.Now().Format("20060102150405"))
+				bpFile, err = packager.Package(bpDir, packager.CacheDir, localVersion, false)
+				Expect(err).To(BeNil())
+
 				proxy, err = cutlass.NewProxy()
 				Expect(err).To(BeNil())
 			})
-			AfterEach(func() { proxy.Close() })
+			AfterEach(func() {
+				os.Remove(bpFile)
+				proxy.Close()
+			})
 
 			It("uses a proxy during staging if present", func() {
 				traffic, err := cutlass.InternetTraffic(

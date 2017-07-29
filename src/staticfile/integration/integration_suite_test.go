@@ -4,9 +4,12 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/cloudfoundry/libbuildpack/cutlass"
+	"github.com/cloudfoundry/libbuildpack/packager"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -22,7 +25,7 @@ func init() {
 	flag.BoolVar(&cutlass.Cached, "cached", false, "cached buildpack")
 	flag.BoolVar(&UpdateBuildpack, "update-buildpack", true, "build buildpack and update to buildpack")
 	flag.StringVar(&cutlass.DefaultMemory, "memory", "256M", "default memory for pushed apps")
-	flag.StringVar(&cutlass.DefaultDisk, "memory", "256M", "default disk for pushed apps")
+	flag.StringVar(&cutlass.DefaultDisk, "disk", "256M", "default disk for pushed apps")
 }
 
 func TestIntegration(t *testing.T) {
@@ -50,8 +53,13 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	buildpackVersion = string(data)
 
-	fmt.Printf("UpdateBuildpack:", UpdateBuildpack)
-	panic("hi")
+	if UpdateBuildpack {
+		localVersion := fmt.Sprintf("%s.%s", buildpackVersion, time.Now().Format("20060102150405"))
+		file, err := packager.Package(bpDir, packager.CacheDir, localVersion, cutlass.Cached)
+		Expect(err).To(BeNil())
+		fmt.Println(file)
+		os.Remove(file)
+	}
 })
 
 var _ = AfterSuite(func() {
