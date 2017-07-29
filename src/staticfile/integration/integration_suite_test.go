@@ -22,10 +22,12 @@ var buildpackVersion string
 var UpdateBuildpack bool
 
 func init() {
-	flag.BoolVar(&cutlass.Cached, "cached", false, "cached buildpack")
+	flag.BoolVar(&cutlass.Cached, "cached", true, "cached buildpack")
 	flag.BoolVar(&UpdateBuildpack, "update-buildpack", true, "build buildpack and update to buildpack")
 	flag.StringVar(&cutlass.DefaultMemory, "memory", "256M", "default memory for pushed apps")
 	flag.StringVar(&cutlass.DefaultDisk, "disk", "256M", "default disk for pushed apps")
+	flag.Parse()
+	fmt.Println("cutlass.Cached", cutlass.Cached)
 }
 
 func TestIntegration(t *testing.T) {
@@ -57,7 +59,6 @@ var _ = BeforeSuite(func() {
 		localVersion := fmt.Sprintf("%s.%s", buildpackVersion, time.Now().Format("20060102150405"))
 		file, err := packager.Package(bpDir, packager.CacheDir, localVersion, cutlass.Cached)
 		Expect(err).To(BeNil())
-		fmt.Println(file)
 		os.Remove(file)
 	}
 })

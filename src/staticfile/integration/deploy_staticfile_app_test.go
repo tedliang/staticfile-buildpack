@@ -102,16 +102,23 @@ var _ = Describe("deploy a staticfile app", func() {
 		}
 	})
 
-	if cutlass.Cached {
+	Describe("internet", func() {
+		var bpFile string
+		BeforeEach(func() {
+			var err error
+			localVersion := fmt.Sprintf("%s.%s", buildpackVersion, time.Now().Format("20060102150405"))
+			bpFile, err = packager.Package(bpDir, packager.CacheDir, localVersion, cutlass.Cached)
+			Expect(err).To(BeNil())
+			bpFile = filepath.Join("src/staticfile/integration", bpFile)
+		})
+		AfterEach(func() { os.Remove(bpFile) })
+
 		FContext("with a cached buildpack", func() {
-			var bpFile string
 			BeforeEach(func() {
-				var err error
-				localVersion := fmt.Sprintf("%s.%s", buildpackVersion, time.Now().Format("20060102150405"))
-				bpFile, err = packager.Package(bpDir, packager.CacheDir, localVersion, true)
-				Expect(err).To(BeNil())
+				if !cutlass.Cached {
+					Skip("Running uncached tests")
+				}
 			})
-			AfterEach(func() { os.Remove(bpFile) })
 
 			It("does not call out over the internet", func() {
 				traffic, err := cutlass.InternetTraffic(
@@ -124,15 +131,14 @@ var _ = Describe("deploy a staticfile app", func() {
 				Expect(traffic).To(HaveLen(0))
 			})
 		})
-	} else {
+
 		FContext("with a uncached buildpack", func() {
 			var proxy *httptest.Server
-			var bpFile string
 			BeforeEach(func() {
 				var err error
-				localVersion := fmt.Sprintf("%s.%s", buildpackVersion, time.Now().Format("20060102150405"))
-				bpFile, err = packager.Package(bpDir, packager.CacheDir, localVersion, false)
-				Expect(err).To(BeNil())
+				if cutlass.Cached {
+					Skip("Running cached tests")
+				}
 
 				proxy, err = cutlass.NewProxy()
 				Expect(err).To(BeNil())
@@ -146,7 +152,7 @@ var _ = Describe("deploy a staticfile app", func() {
 				traffic, err := cutlass.InternetTraffic(
 					bpDir,
 					"fixtures/staticfile_app",
-					"staticfile_buildpack-v1.4.11.zip",
+					bpFile,
 					[]string{"HTTP_PROXY=" + proxy.URL, "HTTPS_PROXY=" + proxy.URL},
 				)
 				Expect(err).To(BeNil())
@@ -159,7 +165,7 @@ var _ = Describe("deploy a staticfile app", func() {
 				)).To(BeNil())
 			})
 		})
-	}
+	})
 
 	PContext("unpackaged buildpack eg. from github", func() {
 		// let(:buildpack) { "staticfile-unpackaged-buildpack-#{rand(1000)}" }
