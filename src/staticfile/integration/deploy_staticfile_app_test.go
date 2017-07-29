@@ -113,7 +113,7 @@ var _ = Describe("deploy a staticfile app", func() {
 		})
 		AfterEach(func() { os.Remove(bpFile) })
 
-		FContext("with a cached buildpack", func() {
+		Context("with a cached buildpack", func() {
 			BeforeEach(func() {
 				if !cutlass.Cached {
 					Skip("Running uncached tests")
@@ -132,7 +132,7 @@ var _ = Describe("deploy a staticfile app", func() {
 			})
 		})
 
-		FContext("with a uncached buildpack", func() {
+		Context("with a uncached buildpack", func() {
 			var proxy *httptest.Server
 			BeforeEach(func() {
 				var err error
