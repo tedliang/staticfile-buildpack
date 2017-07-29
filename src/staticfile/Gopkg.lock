@@ -20,10 +20,10 @@
   revision = "1496a993c0972d2361157f5390c99218f9f0392a"
 
 [[projects]]
-  branch = "master"
   name = "github.com/elazarl/goproxy"
   packages = ["."]
-  revision = "aacba83f36a55ac31cbb71c06547a328c0cd1604"
+  revision = "0a5b8bdb09049ae4ae68e75437ded0b7a2e324e3"
+  version = "v1.0"
 
 [[projects]]
   name = "github.com/golang/mock"
@@ -32,10 +32,10 @@
   version = "v1.0.0"
 
 [[projects]]
+  branch = "master"
   name = "github.com/onsi/ginkgo"
   packages = [".","config","internal/codelocation","internal/containernode","internal/failer","internal/leafnodes","internal/remote","internal/spec","internal/spec_iterator","internal/specrunner","internal/suite","internal/testingtproxy","internal/writer","reporters","reporters/stenographer","reporters/stenographer/support/go-colorable","reporters/stenographer/support/go-isatty","types"]
-  revision = "9eda700730cba42af70d53180f9dcce9266bc2bc"
-  version = "v1.4.0"
+  revision = "8382b23d18dbaaff8e5f7e83784c53ebb8ec2f47"
 
 [[projects]]
   name = "github.com/onsi/gomega"
@@ -88,6 +88,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "88219dd7fe8846b1e200517a2b7f5d9015bdc71cceba2a47a8ed0a4dac2f4202"
+  inputs-digest = "e16e08c15d3ebb82e5a914ab66a27afe2b56812a75617375e4efc89d09e63383"
   solver-name = "gps-cdcl"
   solver-version = 1
