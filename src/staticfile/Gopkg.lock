@@ -20,10 +20,10 @@
   revision = "1496a993c0972d2361157f5390c99218f9f0392a"
 
 [[projects]]
+  branch = "master"
   name = "github.com/elazarl/goproxy"
   packages = ["."]
-  revision = "0a5b8bdb09049ae4ae68e75437ded0b7a2e324e3"
-  version = "v1.0"
+  revision = "aacba83f36a55ac31cbb71c06547a328c0cd1604"
 
 [[projects]]
   name = "github.com/golang/mock"

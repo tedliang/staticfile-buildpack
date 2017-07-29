@@ -2,6 +2,7 @@ package integration_test
 
 import (
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 
@@ -48,6 +49,9 @@ var _ = BeforeSuite(func() {
 	data, err := ioutil.ReadFile(filepath.Join(bpDir, "VERSION"))
 	Expect(err).NotTo(HaveOccurred())
 	buildpackVersion = string(data)
+
+	fmt.Printf("UpdateBuildpack:", UpdateBuildpack)
+	panic("hi")
 })
 
 var _ = AfterSuite(func() {
