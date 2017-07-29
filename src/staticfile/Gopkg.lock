@@ -17,7 +17,7 @@
   branch = "cutlass"
   name = "github.com/cloudfoundry/libbuildpack"
   packages = [".","ansicleaner","cutlass"]
-  revision = "1496a993c0972d2361157f5390c99218f9f0392a"
+  revision = "bd5b5ce9e3f7c19b5614f955d93728b001597dd4"
 
 [[projects]]
   branch = "master"
