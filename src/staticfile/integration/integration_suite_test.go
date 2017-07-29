@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/cloudfoundry/libbuildpack"
 	"github.com/cloudfoundry/libbuildpack/cutlass"
 	"github.com/cloudfoundry/libbuildpack/packager"
 
@@ -35,6 +36,12 @@ func TestIntegration(t *testing.T) {
 	RunSpecs(t, "Integration Suite")
 }
 
+func PushAppAndConfirm(app *cutlass.App) {
+	Expect(app.Push()).To(Succeed())
+	Expect(app.InstanceStates()).To(Equal([]string{"RUNNING"}))
+	Expect(app.ConfirmBuildpack(buildpackVersion)).To(Succeed())
+}
+
 func findRoot() string {
 	file := "VERSION"
 	for {
@@ -56,9 +63,16 @@ var _ = BeforeSuite(func() {
 	buildpackVersion = string(data)
 
 	if UpdateBuildpack {
-		localVersion := fmt.Sprintf("%s.%s", buildpackVersion, time.Now().Format("20060102150405"))
-		file, err := packager.Package(bpDir, packager.CacheDir, localVersion, cutlass.Cached)
+		buildpackVersion = fmt.Sprintf("%s.%s", buildpackVersion, time.Now().Format("20060102150405"))
+		file, err := packager.Package(bpDir, packager.CacheDir, buildpackVersion, cutlass.Cached)
 		Expect(err).To(BeNil())
+
+		var manifest struct {
+			Language string `yaml:"language"`
+		}
+		Expect(libbuildpack.NewYAML().Load(filepath.Join(bpDir, "manifest.yml"), &manifest)).To(Succeed())
+		Expect(cutlass.UpdateBuildpack(manifest.Language, file)).To(Succeed())
+
 		os.Remove(file)
 	}
 })

@@ -32,12 +32,12 @@ type File struct {
 
 var CacheDir string = filepath.Join(os.Getenv("HOME"), ".buildpack-packager", "cache")
 
-func Package(dir, cacheDir, version string, cached bool) (string, error) {
-	dir, err := filepath.Abs(dir)
+func Package(bpDir, cacheDir, version string, cached bool) (string, error) {
+	bpDir, err := filepath.Abs(bpDir)
 	if err != nil {
 		return "", err
 	}
-	dir, err = copyDirectory(dir)
+	dir, err := copyDirectory(bpDir)
 	if err != nil {
 		return "", err
 	}
@@ -99,6 +99,7 @@ func Package(dir, cacheDir, version string, cached bool) (string, error) {
 	if cached {
 		zipFile = fmt.Sprintf("%s_buildpack-cached-v%s.zip", manifest.Language, version)
 	}
+	zipFile = filepath.Join(bpDir, zipFile)
 
 	ZipFiles(zipFile, files)
 

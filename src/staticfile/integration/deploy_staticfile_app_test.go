@@ -31,8 +31,7 @@ var _ = Describe("deploy a staticfile app", func() {
 	})
 
 	It("", func() {
-		Expect(app.Push()).To(Succeed())
-		Expect(app.InstanceStates()).To(Equal([]string{"RUNNING"}))
+		PushAppAndConfirm(app)
 
 		Expect(app.Stdout.String()).To(ContainSubstring("Buildpack version "))
 		Expect(app.Stdout.String()).To(ContainSubstring("HOOKS 1: BeforeCompile"))
@@ -168,6 +167,7 @@ var _ = Describe("deploy a staticfile app", func() {
 	})
 
 	PContext("unpackaged buildpack eg. from github", func() {
+		// localVersion := fmt.Sprintf("%s.%s", buildpackVersion, time.Now().Format("20060102150405"))
 		// let(:buildpack) { "staticfile-unpackaged-buildpack-#{rand(1000)}" }
 		// let(:app) { Machete.deploy_app('staticfile_app', buildpack: buildpack, skip_verify_version: true) }
 		// before do

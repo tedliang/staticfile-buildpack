@@ -79,6 +79,28 @@ func DeleteOrphanedRoutes() error {
 	return nil
 }
 
+func UpdateBuildpack(language, file string) error {
+	command := exec.Command("cf", "update-buildpack", fmt.Sprintf("%s_buildpack", language), "-p", file, "--enable")
+	if data, err := command.CombinedOutput(); err != nil {
+		fmt.Println(string(data))
+		return err
+	}
+	return nil
+}
+
+func (a *App) ConfirmBuildpack(version string) error {
+	if !strings.Contains(a.Stdout.String(), fmt.Sprintf("Buildpack version %s\n", version)) {
+		var versionLine string
+		for _, line := range strings.Split(a.Stdout.String(), "\n") {
+			if versionLine == "" && strings.Contains(line, " Buildpack version ") {
+				versionLine = line
+			}
+		}
+		return fmt.Errorf("Wrong buildpack version(%s): %s", version, versionLine)
+	}
+	return nil
+}
+
 func (a *App) SetEnv(key, value string) {
 	a.env[key] = value
 }
