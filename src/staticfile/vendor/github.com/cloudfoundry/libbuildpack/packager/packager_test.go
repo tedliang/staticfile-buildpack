@@ -3,6 +3,7 @@ package packager_test
 import (
 	"fmt"
 	"io/ioutil"
+	"path/filepath"
 	"time"
 
 	"github.com/cloudfoundry/libbuildpack/packager"
@@ -42,7 +43,9 @@ var _ = Describe("Packager", func() {
 			})
 
 			It("generates a zipfile with name", func() {
-				Expect(zipFile).To(Equal(fmt.Sprintf("ruby_buildpack-v%s.zip", version)))
+				dir, err := filepath.Abs(buildpackDir)
+				Expect(err).To(BeNil())
+				Expect(zipFile).To(Equal(filepath.Join(dir, fmt.Sprintf("ruby_buildpack-v%s.zip", version))))
 			})
 
 			It("includes files listed in manifest.yml", func() {
@@ -77,7 +80,9 @@ var _ = Describe("Packager", func() {
 			})
 
 			It("generates a zipfile with name", func() {
-				Expect(zipFile).To(Equal(fmt.Sprintf("ruby_buildpack-cached-v%s.zip", version)))
+				dir, err := filepath.Abs(buildpackDir)
+				Expect(err).To(BeNil())
+				Expect(zipFile).To(Equal(filepath.Join(dir, fmt.Sprintf("ruby_buildpack-cached-v%s.zip", version))))
 			})
 
 			It("includes files listed in manifest.yml", func() {
