@@ -20,7 +20,6 @@ var _ = Describe("deploy an app using hsts", func() {
 
 	BeforeEach(func() {
 		app = cutlass.New(filepath.Join(bpDir, "fixtures", "with_hsts"))
-		app.SetEnv("BP_DEBUG", "1")
 	})
 
 	It("provides the Strict-Transport-Security header", func() {

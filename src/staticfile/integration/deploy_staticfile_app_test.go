@@ -27,13 +27,13 @@ var _ = Describe("deploy a staticfile app", func() {
 
 	BeforeEach(func() {
 		app = cutlass.New(filepath.Join(bpDir, "fixtures", "staticfile_app"))
+		app.Buildpack = "staticfile_buildpack"
 		app.SetEnv("BP_DEBUG", "1")
 	})
 
-	It("", func() {
+	It("succeeds", func() {
 		PushAppAndConfirm(app)
 
-		Expect(app.Stdout.String()).To(ContainSubstring("Buildpack version "))
 		Expect(app.Stdout.String()).To(ContainSubstring("HOOKS 1: BeforeCompile"))
 		Expect(app.Stdout.String()).To(ContainSubstring("HOOKS 2: AfterCompile"))
 		Expect(app.Stdout.String()).To(MatchRegexp("nginx -p .*/nginx -c .*/nginx/conf/nginx.conf"))
