@@ -14,10 +14,10 @@
   version = "v3.5.1"
 
 [[projects]]
-  branch = "cutlass"
+  branch = "master"
   name = "github.com/cloudfoundry/libbuildpack"
   packages = [".","ansicleaner","cutlass","packager"]
-  revision = "a2598ed607f06c13e018181221b0c4fe2fc096b6"
+  revision = "724e9ae35449660b15cc772add9164fe9103a3d1"
 
 [[projects]]
   branch = "master"
@@ -88,6 +88,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "02a9196232bf05452cb10fd6ed4c011c81bfa3c51aee03da2d5477bfd6ebd683"
+  inputs-digest = "bbd6d393fd614588740a251e401f889de20ca41065f735f63cf313d58a7fb079"
   solver-name = "gps-cdcl"
   solver-version = 1

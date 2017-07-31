@@ -2,7 +2,7 @@
 # for detailed Gopkg.toml documentation.
 
 [[constraint]]
-  branch = "cutlass"
+  branch = "master"
   name = "github.com/cloudfoundry/libbuildpack"
 
 [[constraint]]
