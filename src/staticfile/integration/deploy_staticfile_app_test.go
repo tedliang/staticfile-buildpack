@@ -31,7 +31,7 @@ var _ = Describe("deploy a staticfile app", func() {
 		app.SetEnv("BP_DEBUG", "1")
 	})
 
-	It("succeeds", func() {
+	FIt("succeeds", func() {
 		PushAppAndConfirm(app)
 
 		Expect(app.Stdout.String()).To(ContainSubstring("HOOKS 1: BeforeCompile"))
