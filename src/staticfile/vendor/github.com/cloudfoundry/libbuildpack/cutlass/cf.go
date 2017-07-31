@@ -95,7 +95,7 @@ func UpdateBuildpack(language, file string) error {
 }
 
 func (a *App) ConfirmBuildpack(version string) error {
-	if !strings.Contains(a.Stdout.String(), fmt.Sprintf("Buildpack version %s\n", version)) {
+	if !strings.Contains(a.Stdout.String(), fmt.Sprintf("Buildpack version %s", version)) {
 		var versionLine string
 		for _, line := range strings.Split(a.Stdout.String(), "\n") {
 			if versionLine == "" && strings.Contains(line, " Buildpack version ") {
