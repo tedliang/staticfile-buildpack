@@ -40,12 +40,15 @@ func UniqueDestination(traffic []string, destination string) error {
 }
 
 func executeDockerFile(bp_dir, fixture_path, buildpack_path string, envs []string, network_command string) (string, error) {
+	var err error
+	buildpack_path, err = filepath.Rel(bp_dir, buildpack_path)
+
 	docker_image_name := "internet_traffic_test"
 
 	// docker_env_vars += get_app_env_vars(fixture_path)
 	dockerfile_contents := dockerfile(fixture_path, buildpack_path, envs, network_command)
 
-	err := ioutil.WriteFile(filepath.Join(bp_dir, "itf.Dockerfile"), []byte(dockerfile_contents), 0755)
+	err = ioutil.WriteFile(filepath.Join(bp_dir, "itf.Dockerfile"), []byte(dockerfile_contents), 0755)
 	if err != nil {
 		return "", err
 	}
@@ -54,7 +57,7 @@ func executeDockerFile(bp_dir, fixture_path, buildpack_path string, envs []strin
 
 	cmd := exec.Command("docker", "build", "--rm", "--no-cache", "-t", docker_image_name, "-f", "itf.Dockerfile", ".")
 	cmd.Dir = bp_dir
-	cmd.Stderr = os.Stderr
+	cmd.Stderr = DefaultStdoutStderr
 	output, err := cmd.Output()
 
 	return string(output), err

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
@@ -19,6 +20,7 @@ import (
 var DefaultMemory string = ""
 var DefaultDisk string = ""
 var Cached bool = false
+var DefaultStdoutStderr io.Writer = nil
 
 type cfConfig struct {
 	SpaceFields struct {
@@ -43,6 +45,7 @@ type App struct {
 	Stdout    *bytes.Buffer
 	appGUID   string
 	env       map[string]string
+	logCmd    *exec.Cmd
 }
 
 func New(fixture string) *App {
@@ -52,11 +55,13 @@ func New(fixture string) *App {
 		Buildpack: "",
 		appGUID:   "",
 		env:       map[string]string{},
+		logCmd:    nil,
 	}
 }
 
 func ApiVersion() (string, error) {
 	cmd := exec.Command("cf", "curl", "/v2/info")
+	cmd.Stderr = DefaultStdoutStderr
 	bytes, err := cmd.Output()
 	if err != nil {
 		return "", err
@@ -72,8 +77,9 @@ func ApiVersion() (string, error) {
 
 func DeleteOrphanedRoutes() error {
 	command := exec.Command("cf", "delete-orphaned-routes", "-f")
-	if _, err := command.Output(); err != nil {
-		// fmt.Println(string(data))
+	command.Stdout = DefaultStdoutStderr
+	command.Stderr = DefaultStdoutStderr
+	if err := command.Run(); err != nil {
 		return err
 	}
 	return nil
@@ -126,6 +132,7 @@ func (a *App) AppGUID() (string, error) {
 		return "", err
 	}
 	cmd := exec.Command("cf", "curl", "/v2/apps?q=space_guid:"+guid+"&q=name:"+a.Name)
+	cmd.Stderr = DefaultStdoutStderr
 	bytes, err := cmd.Output()
 	if err != nil {
 		return "", err
@@ -147,6 +154,7 @@ func (a *App) InstanceStates() ([]string, error) {
 		return []string{}, err
 	}
 	cmd := exec.Command("cf", "curl", "/v2/apps/"+guid+"/instances")
+	cmd.Stderr = DefaultStdoutStderr
 	bytes, err := cmd.Output()
 	if err != nil {
 		return []string{}, err
@@ -177,29 +185,33 @@ func (a *App) Push() error {
 		args = append(args, "-k", DefaultDisk)
 	}
 	command := exec.Command("cf", args...)
-	if _, err := command.Output(); err != nil {
-		// fmt.Println(string(data))
+	command.Stdout = DefaultStdoutStderr
+	command.Stderr = DefaultStdoutStderr
+	if err := command.Run(); err != nil {
 		return err
 	}
 
 	for k, v := range a.env {
 		command := exec.Command("cf", "set-env", a.Name, k, v)
-		if _, err := command.Output(); err != nil {
-			// fmt.Println(string(data))
+		command.Stdout = DefaultStdoutStderr
+		command.Stderr = DefaultStdoutStderr
+		if err := command.Run(); err != nil {
 			return err
 		}
 	}
 
-	command = exec.Command("cf", "logs", a.Name)
+	a.logCmd = exec.Command("cf", "logs", a.Name)
+	a.logCmd.Stderr = DefaultStdoutStderr
 	a.Stdout = bytes.NewBuffer(nil)
-	command.Stdout = a.Stdout
-	if err := command.Start(); err != nil {
+	a.logCmd.Stdout = a.Stdout
+	if err := a.logCmd.Start(); err != nil {
 		return err
 	}
 
 	command = exec.Command("cf", "start", a.Name)
-	if _, err := command.Output(); err != nil {
-		// fmt.Println(string(data))
+	command.Stdout = DefaultStdoutStderr
+	command.Stderr = DefaultStdoutStderr
+	if err := command.Run(); err != nil {
 		return err
 	}
 	return nil
@@ -211,6 +223,7 @@ func (a *App) GetUrl(path string) (string, error) {
 		return "", err
 	}
 	cmd := exec.Command("cf", "curl", "/v2/apps/"+guid+"/summary")
+	cmd.Stderr = DefaultStdoutStderr
 	data, err := cmd.Output()
 	if err != nil {
 		return "", err
@@ -265,6 +278,7 @@ func (a *App) GetBody(path string) (string, error) {
 
 func (a *App) Files(path string) ([]string, error) {
 	cmd := exec.Command("cf", "ssh", a.Name, "-c", "find "+path)
+	cmd.Stderr = DefaultStdoutStderr
 	output, err := cmd.Output()
 	if err != nil {
 		return []string{}, err
@@ -273,9 +287,16 @@ func (a *App) Files(path string) ([]string, error) {
 }
 
 func (a *App) Destroy() error {
+	if a.logCmd != nil && a.logCmd.Process != nil {
+		if err := a.logCmd.Process.Kill(); err != nil {
+			return err
+		}
+	}
+
 	command := exec.Command("cf", "delete", "-f", a.Name)
-	_, err := command.Output()
-	return err
+	command.Stdout = DefaultStdoutStderr
+	command.Stderr = DefaultStdoutStderr
+	return command.Run()
 }
 
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyz")
