@@ -12,18 +12,22 @@ import (
 
 func main() {
 	var cached bool
-	var cacheDir string
+	var version, cacheDir string
 
-	version, err := ioutil.ReadFile("VERSION")
-	if err != nil {
-		log.Fatalf("error: Could not read VERSION file: %v", err)
-	}
-
+	flag.StringVar(&version, "version", "", "version to build as")
 	flag.BoolVar(&cached, "cached", false, "include dependencies")
 	flag.StringVar(&cacheDir, "cachedir", packager.CacheDir, "cache dir")
 	flag.Parse()
 
-	zipFile, err := packager.Package(".", cacheDir, string(version), cached)
+	if version == "" {
+		v, err := ioutil.ReadFile("VERSION")
+		if err != nil {
+			log.Fatalf("error: Could not read VERSION file: %v", err)
+		}
+		version = string(v)
+	}
+
+	zipFile, err := packager.Package(".", cacheDir, version, cached)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}

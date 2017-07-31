@@ -20,8 +20,7 @@ var _ = Describe("deploy includes headers", func() {
 
 	BeforeEach(func() {
 		app = cutlass.New(filepath.Join(bpDir, "fixtures", "include_headers"))
-		Expect(app.Push()).To(Succeed())
-		Expect(app.InstanceStates()).To(Equal([]string{"RUNNING"}))
+		PushAppAndConfirm(app)
 	})
 
 	It("adds headers", func() {

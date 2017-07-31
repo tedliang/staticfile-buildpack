@@ -24,8 +24,7 @@ var _ = Describe("a staticfile app with no staticfile", func() {
 	})
 
 	It("runs", func() {
-		Expect(app.Push()).To(Succeed())
-		Expect(app.InstanceStates()).To(Equal([]string{"RUNNING"}))
+		PushAppAndConfirm(app)
 
 		Expect(app.Stdout.String()).ToNot(ContainSubstring("grep: Staticfile: No such file or directory"))
 	})

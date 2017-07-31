@@ -23,8 +23,7 @@ var _ = Describe("a staticfile app with a custom start command that uses boot.sh
 	})
 
 	It("runs", func() {
-		Expect(app.Push()).To(Succeed())
-		Expect(app.InstanceStates()).To(Equal([]string{"RUNNING"}))
+		PushAppAndConfirm(app)
 
 		Expect(app.Stdout.String()).To(ContainSubstring("A custom start command"))
 

@@ -22,8 +22,7 @@ var _ = Describe("deploy a staticfile app", func() {
 	JustBeforeEach(func() {
 		Expect(app_name).ToNot(BeEmpty())
 		app = cutlass.New(filepath.Join(bpDir, "fixtures", app_name))
-		Expect(app.Push()).To(Succeed())
-		Expect(app.InstanceStates()).To(Equal([]string{"RUNNING"}))
+		PushAppAndConfirm(app)
 	})
 
 	Context("ssi is toggled on", func() {

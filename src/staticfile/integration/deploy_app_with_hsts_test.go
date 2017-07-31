@@ -24,8 +24,7 @@ var _ = Describe("deploy an app using hsts", func() {
 	})
 
 	It("provides the Strict-Transport-Security header", func() {
-		Expect(app.Push()).To(Succeed())
-		Expect(app.InstanceStates()).To(Equal([]string{"RUNNING"}))
+		PushAppAndConfirm(app)
 
 		_, headers, err := app.Get("/", map[string]string{})
 		Expect(err).To(BeNil())

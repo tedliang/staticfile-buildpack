@@ -6,7 +6,6 @@ import (
 	"github.com/cloudfoundry/libbuildpack/cutlass"
 
 	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("deploy an app with contents in an alternate root", func() {
@@ -23,10 +22,8 @@ var _ = Describe("deploy an app with contents in an alternate root", func() {
 	})
 
 	It("succeeds", func() {
-		Expect(app.Push()).To(Succeed())
-		Expect(app.InstanceStates()).To(Equal([]string{"RUNNING"}))
+		PushAppAndConfirm(app)
 
-		// TODO
-		// expect(app).to_not have_logged("grep: Staticfile: No such file or directory")
+		Expect(app.Stdout.String()).To(ContainSubstring("grep: Staticfile: No such file or directory"))
 	})
 })

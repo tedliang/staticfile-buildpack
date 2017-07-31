@@ -23,6 +23,7 @@ var buildpackVersion string
 var UpdateBuildpack bool
 
 func init() {
+	flag.StringVar(&buildpackVersion, "version", "", "version to use")
 	flag.BoolVar(&cutlass.Cached, "cached", true, "cached buildpack")
 	flag.BoolVar(&UpdateBuildpack, "update-buildpack", true, "build buildpack and update to buildpack")
 	flag.StringVar(&cutlass.DefaultMemory, "memory", "256M", "default memory for pushed apps")
@@ -58,12 +59,15 @@ func findRoot() string {
 
 var _ = BeforeSuite(func() {
 	bpDir = findRoot()
-	data, err := ioutil.ReadFile(filepath.Join(bpDir, "VERSION"))
-	Expect(err).NotTo(HaveOccurred())
-	buildpackVersion = string(data)
+
+	if buildpackVersion == "" {
+		data, err := ioutil.ReadFile(filepath.Join(bpDir, "VERSION"))
+		Expect(err).NotTo(HaveOccurred())
+		buildpackVersion = string(data)
+		buildpackVersion = fmt.Sprintf("%s.%s", buildpackVersion, time.Now().Format("20060102150405"))
+	}
 
 	if UpdateBuildpack {
-		buildpackVersion = fmt.Sprintf("%s.%s", buildpackVersion, time.Now().Format("20060102150405"))
 		file, err := packager.Package(bpDir, packager.CacheDir, buildpackVersion, cutlass.Cached)
 		Expect(err).To(BeNil())
 

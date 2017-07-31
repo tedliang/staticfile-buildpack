@@ -38,8 +38,7 @@ var _ = Describe("deploy a an app with dot files", func() {
 		app = cutlass.New(appDir)
 		ioutil.WriteFile(filepath.Join(appDir, "Staticfile"), []byte(staticfile_contents), 0644)
 
-		Expect(app.Push()).To(Succeed())
-		Expect(app.InstanceStates()).To(Equal([]string{"RUNNING"}))
+		PushAppAndConfirm(app)
 	})
 
 	Describe("host_dot_files: true is present in Staticfile", func() {

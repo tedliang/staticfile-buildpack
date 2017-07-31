@@ -20,8 +20,7 @@ var _ = Describe("pushing a static app with dummy file in root", func() {
 
 	BeforeEach(func() {
 		app = cutlass.New(filepath.Join(bpDir, "fixtures", "public_unspecified"))
-		Expect(app.Push()).To(Succeed())
-		Expect(app.InstanceStates()).To(Equal([]string{"RUNNING"}))
+		PushAppAndConfirm(app)
 	})
 
 	It("should only have dummy file in public", func() {

@@ -21,8 +21,7 @@ var _ = Describe("deploy a basic auth app", func() {
 
 	It("the app uses Staticfile.auth", func() {
 		app = cutlass.New(filepath.Join(bpDir, "fixtures", "basic_auth"))
-		Expect(app.Push()).To(Succeed())
-		Expect(app.InstanceStates()).To(Equal([]string{"RUNNING"}))
+		PushAppAndConfirm(app)
 
 		By("uses the provided credentials for authorization", func() {
 			body, _, err := app.Get("/", map[string]string{"user": "bob", "password": "bob"})
@@ -59,8 +58,7 @@ var _ = Describe("deploy a basic auth app", func() {
 
 			app = cutlass.New(appDir)
 			app.Buildpack = "staticfile_buildpack"
-			Expect(app.Push()).To(Succeed())
-			Expect(app.InstanceStates()).To(Equal([]string{"RUNNING"}))
+			PushAppAndConfirm(app)
 		})
 		AfterEach(func() {
 			if appDir != "" {

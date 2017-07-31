@@ -20,8 +20,7 @@ var _ = Describe("deploy a staticfile app", func() {
 
 	BeforeEach(func() {
 		app = cutlass.New(filepath.Join(bpDir, "fixtures", "pushstate"))
-		Expect(app.Push()).To(Succeed())
-		Expect(app.InstanceStates()).To(Equal([]string{"RUNNING"}))
+		PushAppAndConfirm(app)
 	})
 
 	It("with pushstate", func() {

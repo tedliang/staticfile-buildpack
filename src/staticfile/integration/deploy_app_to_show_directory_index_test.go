@@ -23,8 +23,7 @@ var _ = Describe("deploy an app that shows the directory index", func() {
 	})
 
 	It("runs", func() {
-		Expect(app.Push()).To(Succeed())
-		Expect(app.InstanceStates()).To(Equal([]string{"RUNNING"}))
+		PushAppAndConfirm(app)
 
 		body, err := app.GetBody("/")
 		Expect(err).To(BeNil())
