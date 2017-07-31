@@ -103,13 +103,12 @@ var _ = Describe("deploy a staticfile app", func() {
 
 	Describe("internet", func() {
 		var bpFile string
-		BeforeEach(func() {
+		buildBpFile := func() {
 			var err error
 			localVersion := fmt.Sprintf("%s.%s", buildpackVersion, time.Now().Format("20060102150405"))
 			bpFile, err = packager.Package(bpDir, packager.CacheDir, localVersion, cutlass.Cached)
 			Expect(err).To(BeNil())
-			bpFile = filepath.Join("src/staticfile/integration", bpFile)
-		})
+		}
 		AfterEach(func() { os.Remove(bpFile) })
 
 		Context("with a cached buildpack", func() {
@@ -117,6 +116,7 @@ var _ = Describe("deploy a staticfile app", func() {
 				if !cutlass.Cached {
 					Skip("Running uncached tests")
 				}
+				buildBpFile()
 			})
 
 			It("does not call out over the internet", func() {
@@ -138,6 +138,8 @@ var _ = Describe("deploy a staticfile app", func() {
 				if cutlass.Cached {
 					Skip("Running cached tests")
 				}
+
+				buildBpFile()
 
 				proxy, err = cutlass.NewProxy()
 				Expect(err).To(BeNil())

@@ -4,13 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"path/filepath"
 	"time"
 
-	"github.com/cloudfoundry/libbuildpack"
 	"github.com/cloudfoundry/libbuildpack/cutlass"
-	"github.com/cloudfoundry/libbuildpack/packager"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -25,9 +22,8 @@ var UpdateBuildpack bool
 func init() {
 	flag.StringVar(&buildpackVersion, "version", "", "version to use")
 	flag.BoolVar(&cutlass.Cached, "cached", true, "cached buildpack")
-	flag.BoolVar(&UpdateBuildpack, "update-buildpack", true, "build buildpack and update to buildpack")
-	flag.StringVar(&cutlass.DefaultMemory, "memory", "256M", "default memory for pushed apps")
-	flag.StringVar(&cutlass.DefaultDisk, "disk", "256M", "default disk for pushed apps")
+	flag.StringVar(&cutlass.DefaultMemory, "memory", "128M", "default memory for pushed apps")
+	flag.StringVar(&cutlass.DefaultDisk, "disk", "128M", "default disk for pushed apps")
 	flag.Parse()
 	fmt.Println("cutlass.Cached", cutlass.Cached)
 }
@@ -39,7 +35,7 @@ func TestIntegration(t *testing.T) {
 
 func PushAppAndConfirm(app *cutlass.App) {
 	Expect(app.Push()).To(Succeed())
-	Expect(app.InstanceStates()).To(Equal([]string{"RUNNING"}))
+	Eventually(func() ([]string, error) { return app.InstanceStates() }, 10*time.Second).Should(Equal([]string{"RUNNING"}))
 	Expect(app.ConfirmBuildpack(buildpackVersion)).To(Succeed())
 }
 
@@ -67,18 +63,7 @@ var _ = BeforeSuite(func() {
 		buildpackVersion = fmt.Sprintf("%s.%s", buildpackVersion, time.Now().Format("20060102150405"))
 	}
 
-	if UpdateBuildpack {
-		file, err := packager.Package(bpDir, packager.CacheDir, buildpackVersion, cutlass.Cached)
-		Expect(err).To(BeNil())
-
-		var manifest struct {
-			Language string `yaml:"language"`
-		}
-		Expect(libbuildpack.NewYAML().Load(filepath.Join(bpDir, "manifest.yml"), &manifest)).To(Succeed())
-		Expect(cutlass.UpdateBuildpack(manifest.Language, file)).To(Succeed())
-
-		os.Remove(file)
-	}
+	cutlass.DefaultStdoutStderr = GinkgoWriter
 })
 
 var _ = AfterSuite(func() {
