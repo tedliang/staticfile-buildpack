@@ -6,7 +6,7 @@ type Cf interface {
 	Buildpack(file string) error
 	Cleanup() error
 
-	New(fixture string) CfApp
+	New(fixture string) (CfApp, error)
 }
 
 type CfApp interface {
@@ -14,7 +14,7 @@ type CfApp interface {
 	SetEnv(key, value string)
 	Push() error
 	Restart() error
-	IsRunning(max int) bool
+	IsRunning() bool
 	Stdout() string
 	GetBody(path string) (string, error)
 	Files(path string) ([]string, error)
