@@ -6,9 +6,11 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/cloudfoundry/libbuildpack"
+	"github.com/cloudfoundry/libbuildpack/cutlass/interfaces"
 	"github.com/cloudfoundry/libbuildpack/packager"
 )
 
@@ -70,6 +72,19 @@ func PackageUniquelyVersionedBuildpack() (VersionedBuildpackPackage, error) {
 		Version: buildpackVersion,
 		File:    file,
 	}, nil
+}
+
+func ConfirmBuildpack(a interfaces.CfApp, version string) error {
+	if !strings.Contains(a.Stdout(), fmt.Sprintf("Buildpack version %s\n", version)) {
+		var versionLine string
+		for _, line := range strings.Split(a.Stdout(), "\n") {
+			if versionLine == "" && strings.Contains(line, " Buildpack version ") {
+				versionLine = line
+			}
+		}
+		return fmt.Errorf("Wrong buildpack version. Expected '%s', but this was logged: %s", version, versionLine)
+	}
+	return nil
 }
 
 func SeedRandom() {
