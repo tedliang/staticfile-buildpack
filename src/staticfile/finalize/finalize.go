@@ -235,13 +235,16 @@ func (sf *Finalizer) CopyFilesToPublic(appRootDir string) error {
 
 	for _, file := range files {
 		if skipCopyFile[file.Name()] {
+			sf.Log.Debug("Skip: %s", file.Name())
 			continue
 		}
 
 		if strings.HasPrefix(file.Name(), ".") && !sf.Config.HostDotFiles {
+			sf.Log.Debug("Skip: %s", file.Name())
 			continue
 		}
 
+		sf.Log.Debug("Move: %s", file.Name())
 		err = os.Rename(filepath.Join(appRootDir, file.Name()), filepath.Join(tmpDir, file.Name()))
 		if err != nil {
 			return err

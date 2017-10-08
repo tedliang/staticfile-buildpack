@@ -1,12 +1,24 @@
 package cutlass
 
 import (
-	"github.com/cloudfoundry/libbuildpack"
 	"io"
 	"io/ioutil"
+	"math/rand"
 	"os"
 	"path/filepath"
+
+	"github.com/cloudfoundry/libbuildpack"
 )
+
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyz")
+
+func RandStringRunes(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
+}
 
 func CopyFixture(srcDir string) (string, error) {
 	destDir, err := ioutil.TempDir("", "cutlass-fixture-copy")

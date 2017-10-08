@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/libbuildpack"
-	"github.com/cloudfoundry/libbuildpack/cutlass/interfaces"
+	"github.com/cloudfoundry/libbuildpack/cutlass/models"
 	"github.com/cloudfoundry/libbuildpack/packager"
 )
 
@@ -74,7 +74,7 @@ func PackageUniquelyVersionedBuildpack() (VersionedBuildpackPackage, error) {
 	}, nil
 }
 
-func ConfirmBuildpack(a interfaces.CfApp, version string) error {
+func ConfirmBuildpack(a models.CfApp, version string) error {
 	if !strings.Contains(a.Stdout(), fmt.Sprintf("Buildpack version %s\n", version)) {
 		var versionLine string
 		for _, line := range strings.Split(a.Stdout(), "\n") {

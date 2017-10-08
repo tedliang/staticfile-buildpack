@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/libbuildpack/cutlass"
+	"github.com/cloudfoundry/libbuildpack/cutlass/cflocal"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -53,6 +54,8 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 	cutlass.SeedRandom()
 	cutlass.DefaultStdoutStderr = GinkgoWriter
+
+	cutlass.Cf = cflocal.New("", packagedBuildpack.File, cutlass.DefaultMemory, cutlass.DefaultDisk, GinkgoWriter)
 })
 
 var _ = SynchronizedAfterSuite(func() {
@@ -70,6 +73,6 @@ func TestIntegration(t *testing.T) {
 
 func PushAppAndConfirm(app *cutlass.App) {
 	Expect(app.Push()).To(Succeed())
-	Eventually(func() ([]string, error) { return app.InstanceStates() }, 10*time.Second).Should(Equal([]string{"RUNNING"}))
+	Eventually(app.IsRunning, 10*time.Second).Should(BeTrue())
 	Expect(app.ConfirmBuildpack(buildpackVersion)).To(Succeed())
 }

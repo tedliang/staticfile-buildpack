@@ -23,7 +23,7 @@ type cluster struct {
 	DefaultStdoutStderr io.Writer
 }
 
-func New(language, memory, disk string, out io.Writer) interfaces.Cf {
+func New(language, memory, disk string, out io.Writer) models.Cf {
 	return &cluster{
 		Language: language
 		DefaultMemory: memory
@@ -31,6 +31,8 @@ func New(language, memory, disk string, out io.Writer) interfaces.Cf {
 		DefaultStdoutStderr: out
 	}
 }
+
+var _ = models.Cf(&cluster{})
 
 type app struct {
 	Name       string
@@ -45,7 +47,9 @@ type app struct {
 	logCmd     *exec.Cmd
 }
 
-func (c *cluster) New(fixture string) interfaces.CfApp {
+var _ = models.CfApp(&app{})
+
+func (c *cluster) New(fixture string) models.CfApp {
 	return &app{
 		Name:       filepath.Base(fixture) + "-" + RandStringRunes(20),
 		Path:       fixture,

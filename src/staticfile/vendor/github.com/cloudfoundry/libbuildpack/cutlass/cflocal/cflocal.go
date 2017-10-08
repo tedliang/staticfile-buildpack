@@ -6,16 +6,15 @@ import (
 	"io"
 	"io/ioutil"
 	"net"
-	"net/http"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
-	"strconv"
 	"time"
 
 	"github.com/cloudfoundry/libbuildpack"
 	"github.com/cloudfoundry/libbuildpack/cutlass"
-	"github.com/cloudfoundry/libbuildpack/cutlass/interfaces"
+	"github.com/cloudfoundry/libbuildpack/cutlass/models"
 )
 
 type local struct {
@@ -26,7 +25,9 @@ type local struct {
 	buildpackPath       string
 }
 
-func New(language, buildpackPath, memory, disk string, out io.Writer) interfaces.Cf {
+var _ = models.Cf(&local{})
+
+func New(language, buildpackPath, memory, disk string, out io.Writer) models.Cf {
 	return &local{
 		Language:            language,
 		DefaultMemory:       memory,
@@ -51,7 +52,9 @@ type app struct {
 	port                string
 }
 
-func (c *local) New(fixture string) (interfaces.CfApp, error) {
+var _ = models.CfApp(&app{})
+
+func (c *local) New(fixture string) (models.CfApp, error) {
 	tmpDir, err := ioutil.TempDir("", "cutlass.cflocal.")
 	if err != nil {
 		return nil, err
@@ -117,7 +120,7 @@ func (a *app) Push() error {
 	}
 
 	// FIXME -- Should add "-e" for default buildpack case
-	cmd := exec.Command("cf", "local", "stage", a.Name)
+	cmd := exec.Command("cf", "local", "stage", a.Name, "-p", a.Path)
 	cmd.Dir = a.tmpDir
 	cmd.Stderr = a.DefaultStdoutStderr
 	cmd.Stdout = a.stdout
@@ -183,50 +186,12 @@ func (a *app) Stdout() string {
 func (a *app) GetUrl(path string) (string, error) {
 	return fmt.Sprintf("http://localhost:%s%s", a.port, path), nil
 }
-func (a *app) Get(path string, headers map[string]string) (string, map[string][]string, error) {
-	url, err := a.GetUrl(path)
-	if err != nil {
-		return "", map[string][]string{}, err
-	}
-	client := &http.Client{}
-	if headers["NoFollow"] == "true" {
-		client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse
-		}
-		delete(headers, "NoFollow")
-	}
-	req, _ := http.NewRequest("GET", url, nil)
-	for k, v := range headers {
-		req.Header.Add(k, v)
-	}
-	if headers["user"] != "" && headers["password"] != "" {
-		req.SetBasicAuth(headers["user"], headers["password"])
-		delete(headers, "user")
-		delete(headers, "password")
-	}
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", map[string][]string{}, err
-	}
-	defer resp.Body.Close()
-	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", map[string][]string{}, err
-	}
-	resp.Header["StatusCode"] = []string{strconv.Itoa(resp.StatusCode)}
-	return string(data), resp.Header, err
-}
-func (a *app) GetBody(path string) (string, error) {
-	body, _, err := a.Get(path, map[string]string{})
-	// TODO: Non 200 ??
-	// if !(len(headers["StatusCode"]) == 1 && headers["StatusCode"][0] == "200") {
-	// 	return "", fmt.Errorf("non 200 status: %v", headers)
-	// }
-	return body, err
-}
 func (a *app) Files(path string) ([]string, error) {
 	return nil, nil
 }
 func (a *app) Destroy() error {
-	return nil
+	if err := a.stop(); err != nil {
+		return err
+	}
+	return os.RemoveAll(a.tmpDir)
 }

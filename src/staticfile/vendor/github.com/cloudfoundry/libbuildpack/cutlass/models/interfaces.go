@@ -1,4 +1,4 @@
-package interfaces
+package models
 
 type Cf interface {
 	HasTask() (bool, error)
@@ -16,7 +16,7 @@ type CfApp interface {
 	Restart() error
 	IsRunning() bool
 	Stdout() string
-	GetBody(path string) (string, error)
+	GetUrl(path string) (string, error)
 	Files(path string) ([]string, error)
 	Destroy() error
 }

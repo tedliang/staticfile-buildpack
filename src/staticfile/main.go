@@ -3,37 +3,47 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
+	"github.com/cloudfoundry/libbuildpack/cutlass"
 	"github.com/cloudfoundry/libbuildpack/cutlass/cflocal"
-	"github.com/cloudfoundry/libbuildpack/cutlass/interfaces"
+	"github.com/cloudfoundry/libbuildpack/cutlass/models"
 )
 
 func main() {
-	bpPath := "/home/dgodd/workspace/staticfile-buildpack/staticfile_buildpack-cached-v1.4.16.zip"
+	bpPath, _ := filepath.Abs("../../staticfile_buildpack-cached-v1.4.16.zip")
+	// bpPath := "https://github.com/cloudfoundry/staticfile-buildpack/releases/download/v1.4.16/staticfile-buildpack-v1.4.16.zip"
+	// fixPath, _ := filepath.Abs("../../fixtures/staticfile_app")
+	fixPath, _ := filepath.Abs("../../fixtures/include_headers")
 	cf := cflocal.New("staticfile", bpPath, "1Gb", "1Gb", os.Stdout)
-	app, err := cf.New("../../fixtures/staticfile_app")
+	app, err := cf.New(fixPath)
 	if err != nil {
 		panic(err)
 	}
+	app.SetEnv("BP_DEBUG", "1")
 	if err := app.Push(); err != nil {
 		fmt.Println(app.Stdout())
 		panic(err)
 	}
 
 	waitForRunning(app)
-	time.Sleep(1 * time.Second)
 
-	if body, err := app.GetBody("/"); err != nil {
+	if body, err := cutlass.GetBody(app, ""); err != nil {
 		panic(err)
 	} else {
 		fmt.Println(body)
 	}
 
+	time.Sleep(1 * time.Second)
 	fmt.Println(app.Stdout())
+
+	if err := app.Destroy(); err != nil {
+		panic(err)
+	}
 }
 
-func waitForRunning(app interfaces.CfApp) {
+func waitForRunning(app models.CfApp) {
 	timeout := time.After(5 * time.Second)
 	tick := time.Tick(100 * time.Millisecond)
 Loop:
