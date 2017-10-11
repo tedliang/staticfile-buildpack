@@ -31,6 +31,8 @@ func init() {
 var _ = SynchronizedBeforeSuite(func() []byte {
 	// Run once
 	if buildpackVersion == "" {
+		cutlass.Cf = cflocal.New("", "", cutlass.DefaultMemory, cutlass.DefaultDisk, GinkgoWriter)
+
 		packagedBuildpack, err := cutlass.PackageUniquelyVersionedBuildpack()
 		Expect(err).NotTo(HaveOccurred())
 
@@ -73,6 +75,6 @@ func TestIntegration(t *testing.T) {
 
 func PushAppAndConfirm(app *cutlass.App) {
 	Expect(app.Push()).To(Succeed())
-	Eventually(app.IsRunning, 10*time.Second).Should(BeTrue())
+	Eventually(app.IsRunning, 20*time.Second).Should(BeTrue())
 	Expect(app.ConfirmBuildpack(buildpackVersion)).To(Succeed())
 }

@@ -35,7 +35,7 @@ func New(language, memory, disk string, out io.Writer) models.Cf {
 var _ = models.Cf(&cluster{})
 
 type app struct {
-	Name       string
+	name       string
 	Path       string
 	Stack      string
 	Buildpacks []string
@@ -51,7 +51,7 @@ var _ = models.CfApp(&app{})
 
 func (c *cluster) New(fixture string) models.CfApp {
 	return &app{
-		Name:       filepath.Base(fixture) + "-" + RandStringRunes(20),
+		name:       filepath.Base(fixture) + "-" + RandStringRunes(20),
 		Path:       fixture,
 		Stack:      "",
 		Buildpacks: []string{},
@@ -151,8 +151,12 @@ func (c *cluster) Buildpack(file string) error {
 	return createBuildpack(c.Language, file)
 }
 
+func (a *App) Name() string {
+	return a.name
+}
+
 func (a *App) RunTask(command string) ([]byte, error) {
-	cmd := exec.Command("cf", "run-task", a.Name, command)
+	cmd := exec.Command("cf", "run-task", a.name, command)
 	cmd.Stderr = DefaultStdoutStderr
 	bytes, err := cmd.Output()
 	if err != nil {
@@ -162,7 +166,7 @@ func (a *App) RunTask(command string) ([]byte, error) {
 }
 
 func (a *App) Restart() error {
-	command := exec.Command("cf", "restart", a.Name)
+	command := exec.Command("cf", "restart", a.name)
 	command.Stdout = DefaultStdoutStderr
 	command.Stderr = DefaultStdoutStderr
 	if err := command.Run(); err != nil {
@@ -199,7 +203,7 @@ func (a *App) AppGUID() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	cmd := exec.Command("cf", "curl", "/v2/apps?q=space_guid:"+guid+"&q=name:"+a.Name)
+	cmd := exec.Command("cf", "curl", "/v2/apps?q=space_guid:"+guid+"&q=name:"+a.name)
 	cmd.Stderr = DefaultStdoutStderr
 	bytes, err := cmd.Output()
 	if err != nil {
@@ -256,7 +260,7 @@ func (a *App) IsRunning(max int) bool {
 }
 
 func (a *App) Push() error {
-	args := []string{"push", a.Name, "--no-start", "-p", a.Path}
+	args := []string{"push", a.name, "--no-start", "-p", a.Path}
 	if a.Stack != "" {
 		args = append(args, "-s", a.Stack)
 	}
@@ -280,7 +284,7 @@ func (a *App) Push() error {
 	}
 
 	for k, v := range a.env {
-		command := exec.Command("cf", "set-env", a.Name, k, v)
+		command := exec.Command("cf", "set-env", a.name, k, v)
 		command.Stdout = DefaultStdoutStderr
 		command.Stderr = DefaultStdoutStderr
 		if err := command.Run(); err != nil {
@@ -288,7 +292,7 @@ func (a *App) Push() error {
 		}
 	}
 
-	a.logCmd = exec.Command("cf", "logs", a.Name)
+	a.logCmd = exec.Command("cf", "logs", a.name)
 	a.logCmd.Stderr = DefaultStdoutStderr
 	a.Stdout = bytes.NewBuffer(nil)
 	a.logCmd.Stdout = a.Stdout
@@ -297,12 +301,12 @@ func (a *App) Push() error {
 	}
 
 	if len(a.Buildpacks) > 1 {
-		args = []string{"v3-push", a.Name, "-p", a.Path}
+		args = []string{"v3-push", a.name, "-p", a.Path}
 		for _, buildpack := range a.Buildpacks {
 			args = append(args, "-b", buildpack)
 		}
 	} else {
-		args = []string{"start", a.Name}
+		args = []string{"start", a.name}
 	}
 	command = exec.Command("cf", args...)
 	command.Stdout = DefaultStdoutStderr
@@ -373,7 +377,7 @@ func (a *App) GetBody(path string) (string, error) {
 }
 
 func (a *App) Files(path string) ([]string, error) {
-	cmd := exec.Command("cf", "ssh", a.Name, "-c", "find "+path)
+	cmd := exec.Command("cf", "ssh", a.name, "-c", "find "+path)
 	cmd.Stderr = DefaultStdoutStderr
 	output, err := cmd.Output()
 	if err != nil {
@@ -389,7 +393,7 @@ func (a *App) Destroy() error {
 		}
 	}
 
-	command := exec.Command("cf", "delete", "-f", a.Name)
+	command := exec.Command("cf", "delete", "-f", a.name)
 	command.Stdout = DefaultStdoutStderr
 	command.Stderr = DefaultStdoutStderr
 	return command.Run()

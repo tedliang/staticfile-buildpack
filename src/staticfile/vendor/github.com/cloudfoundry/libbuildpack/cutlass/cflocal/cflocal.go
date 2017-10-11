@@ -38,10 +38,10 @@ func New(language, buildpackPath, memory, disk string, out io.Writer) models.Cf 
 }
 
 type app struct {
-	Name                string
+	name                string
 	Path                string
 	Stack               string
-	Buildpacks          []string
+	buildpacks          []string
 	Memory              string
 	Disk                string
 	DefaultStdoutStderr io.Writer
@@ -60,10 +60,10 @@ func (c *local) New(fixture string) (models.CfApp, error) {
 		return nil, err
 	}
 	return &app{
-		Name:                filepath.Base(fixture) + "-" + cutlass.RandStringRunes(20),
+		name:                filepath.Base(fixture) + "-" + cutlass.RandStringRunes(20),
 		Path:                fixture,
 		Stack:               "",
-		Buildpacks:          []string{c.buildpackPath},
+		buildpacks:          []string{c.buildpackPath},
 		Memory:              c.DefaultMemory,
 		Disk:                c.DefaultDisk,
 		DefaultStdoutStderr: c.DefaultStdoutStderr,
@@ -87,23 +87,29 @@ func (c *local) Cleanup() error {
 	return nil
 }
 
+func (a *app) Name() string {
+	return a.name
+}
 func (a *app) RunTask(command string) ([]byte, error) {
 	return nil, fmt.Errorf("Tasks can not be run on cf local")
 }
 func (a *app) SetEnv(key, value string) {
 	a.env[key] = value
 }
+func (a *app) Buildpacks(paths ...string) {
+	a.buildpacks = paths
+}
 func (a *app) generateLocalYML() error {
 	app := struct {
-		Name       string
+		Name       string   `json:"name"`
 		Buildpacks []string `json:"buildpacks"`
 		// Command    string            `json:"command"`
 		Memory string            `json:"memory"`
 		Disk   string            `json:"disk_quota"`
 		ENV    map[string]string `json:"env"`
 	}{
-		a.Name,
-		a.Buildpacks,
+		a.name,
+		a.buildpacks,
 		// "",
 		a.Memory,
 		a.Disk,
@@ -120,7 +126,7 @@ func (a *app) Push() error {
 	}
 
 	// FIXME -- Should add "-e" for default buildpack case
-	cmd := exec.Command("cf", "local", "stage", a.Name, "-p", a.Path)
+	cmd := exec.Command("cf", "local", "stage", a.name, "-p", a.Path)
 	cmd.Dir = a.tmpDir
 	cmd.Stderr = a.DefaultStdoutStderr
 	cmd.Stdout = a.stdout
@@ -134,7 +140,7 @@ func (a *app) start() error {
 	var buf bytes.Buffer
 	w := io.MultiWriter(&buf, a.stdout)
 
-	a.logCmd = exec.Command("cf", "local", "run", a.Name)
+	a.logCmd = exec.Command("cf", "local", "run", a.name)
 	a.logCmd.Dir = a.tmpDir
 	a.logCmd.Stderr = a.DefaultStdoutStderr
 	a.logCmd.Stdout = w
@@ -184,6 +190,7 @@ func (a *app) Stdout() string {
 	return a.stdout.String()
 }
 func (a *app) GetUrl(path string) (string, error) {
+	fmt.Printf("GetUrl: http://localhost:%s%s", a.port, path)
 	return fmt.Sprintf("http://localhost:%s%s", a.port, path), nil
 }
 func (a *app) Files(path string) ([]string, error) {

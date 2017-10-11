@@ -38,12 +38,12 @@ var _ = Describe("deploy a basic auth app", func() {
 		})
 
 		By("does not write the contents of .htpasswd to the logs", func() {
-			Expect(app.Stdout.String()).ToNot(ContainSubstring("bob:$"))
-			Expect(app.Stdout.String()).ToNot(ContainSubstring("dave:$"))
+			Expect(app.Stdout()).ToNot(ContainSubstring("bob:$"))
+			Expect(app.Stdout()).ToNot(ContainSubstring("dave:$"))
 		})
 
 		By("logs the source of authentication credentials", func() {
-			Expect(app.Stdout.String()).To(ContainSubstring("-----> Enabling basic authentication using Staticfile.auth"))
+			Expect(app.Stdout()).To(ContainSubstring("-----> Enabling basic authentication using Staticfile.auth"))
 		})
 	})
 
@@ -57,7 +57,7 @@ var _ = Describe("deploy a basic auth app", func() {
 			Expect(os.Remove(filepath.Join(appDir, "Staticfile"))).To(Succeed())
 
 			app = cutlass.New(appDir)
-			app.Buildpacks = []string{"staticfile_buildpack"}
+			app.Buildpacks("staticfile_buildpack")
 			PushAppAndConfirm(app)
 		})
 		AfterEach(func() {

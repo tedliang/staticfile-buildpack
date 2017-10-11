@@ -9,14 +9,14 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("deploy an app that shows the directory index", func() {
+var _ = FDescribe("deploy an app that shows the directory index", func() {
 	var app *cutlass.App
-	AfterEach(func() {
-		if app != nil {
-			app.Destroy()
-		}
-		app = nil
-	})
+	// AfterEach(func() {
+	// 	if app != nil {
+	// 		app.Destroy()
+	// 	}
+	// 	app = nil
+	// })
 
 	BeforeEach(func() {
 		app = cutlass.New(filepath.Join(bpDir, "fixtures", "directory_index"))
@@ -30,8 +30,6 @@ var _ = Describe("deploy an app that shows the directory index", func() {
 		Expect(body).To(ContainSubstring("find-me-too.html"))
 		Expect(body).To(ContainSubstring("find-me.html"))
 
-		body, err = app.GetBody("/subdir")
-		Expect(err).To(BeNil())
-		Expect(body).To(ContainSubstring("This index file should still load normally when viewing a directory; and not a directory index."))
+		Expect(app.GetBody("/subdir")).To(ContainSubstring("This index file should still load normally when viewing a directory; and not a directory index."))
 	})
 })

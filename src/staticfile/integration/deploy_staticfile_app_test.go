@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/blang/semver"
 	"github.com/cloudfoundry/libbuildpack/cutlass"
 	"github.com/cloudfoundry/libbuildpack/packager"
 
@@ -28,16 +27,16 @@ var _ = Describe("deploy a staticfile app", func() {
 
 	BeforeEach(func() {
 		app = cutlass.New(filepath.Join(bpDir, "fixtures", "staticfile_app"))
-		app.Buildpacks = []string{"staticfile_buildpack"}
+		app.Buildpacks("staticfile_buildpack")
 		app.SetEnv("BP_DEBUG", "1")
 	})
 
 	It("succeeds", func() {
 		PushAppAndConfirm(app)
 
-		Expect(app.Stdout.String()).To(ContainSubstring("HOOKS 1: BeforeCompile"))
-		Expect(app.Stdout.String()).To(ContainSubstring("HOOKS 2: AfterCompile"))
-		Expect(app.Stdout.String()).To(MatchRegexp("nginx -p .*/nginx -c .*/nginx/conf/nginx.conf"))
+		Expect(app.Stdout()).To(ContainSubstring("HOOKS 1: BeforeCompile"))
+		Expect(app.Stdout()).To(ContainSubstring("HOOKS 2: AfterCompile"))
+		Expect(app.Stdout()).To(MatchRegexp("nginx -p .*/nginx -c .*/nginx/conf/nginx.conf"))
 
 		Expect(app.GetBody("/")).To(ContainSubstring("This is an example app for Cloud Foundry that is only static HTML/JS/CSS assets."))
 
@@ -69,21 +68,17 @@ var _ = Describe("deploy a staticfile app", func() {
 			})
 		})
 
-		apiVersionString, err := cutlass.ApiVersion()
-		Expect(err).To(BeNil())
-		apiVersion, err := semver.Make(apiVersionString)
-		Expect(err).To(BeNil())
-		apiHasTask, err := semver.ParseRange("> 2.75.0")
-		Expect(err).To(BeNil())
-		if apiHasTask(apiVersion) {
+		apiHasTask, err := cutlass.Cf.HasTask()
+		Expect(err).ToNot(HaveOccurred())
+		if apiHasTask {
 			By("running a task", func() {
 				By("exits", func() {
-					command := exec.Command("cf", "run-task", app.Name, "wc -l public/index.html")
+					command := exec.Command("cf", "run-task", app.Name(), "wc -l public/index.html")
 					_, err := command.Output()
 					Expect(err).To(BeNil())
 
 					Eventually(func() string {
-						output, err := exec.Command("cf", "tasks", app.Name).Output()
+						output, err := exec.Command("cf", "tasks", app.Name()).Output()
 						Expect(err).To(BeNil())
 						return string(output)
 					}, "30s").Should(MatchRegexp("SUCCEEDED.*wc.*index.html"))
@@ -94,13 +89,13 @@ var _ = Describe("deploy a staticfile app", func() {
 		if cutlass.Cached {
 			By("with a cached buildpack", func() {
 				By("logs the files it downloads", func() {
-					Expect(app.Stdout.String()).To(ContainSubstring("Copy [/"))
+					Expect(app.Stdout()).To(ContainSubstring("Copy [/"))
 				})
 			})
 		} else {
 			By("with a uncached buildpack", func() {
 				By("logs the files it downloads", func() {
-					Expect(app.Stdout.String()).To(ContainSubstring("Download [https://"))
+					Expect(app.Stdout()).To(ContainSubstring("Download [https://"))
 				})
 			})
 		}

@@ -46,6 +46,10 @@ func CreateOrUpdateBuildpack(language, file string) error {
 	return Cf.Buildpack(file)
 }
 
+func (a *App) Name() string {
+	return a.app.Name()
+}
+
 func (a *App) ConfirmBuildpack(version string) error {
 	return ConfirmBuildpack(a.app, version)
 }
@@ -62,8 +66,16 @@ func (a *App) IsRunning() bool {
 	return a.app.IsRunning()
 }
 
+func (a *App) Stdout() string {
+	return a.app.Stdout()
+}
+
 func (a *App) SetEnv(key, value string) {
 	a.app.SetEnv(key, value)
+}
+
+func (a *App) Buildpacks(paths ...string) {
+	a.app.Buildpacks(paths...)
 }
 
 func (a *App) Push() error {

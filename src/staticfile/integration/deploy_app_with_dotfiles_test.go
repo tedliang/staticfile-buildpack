@@ -48,7 +48,7 @@ var _ = Describe("deploy a an app with dot files", func() {
 				staticfile_contents = "host_dot_files: true"
 			})
 			It("hosts the dotfiles", func() {
-				Expect(app.Stdout.String()).To(ContainSubstring("Enabling hosting of dotfiles"))
+				Expect(app.Stdout()).To(ContainSubstring("Enabling hosting of dotfiles"))
 				Expect(app.GetBody("/.hidden.html")).To(ContainSubstring("Hello from a hidden file"))
 			})
 		})
@@ -58,7 +58,7 @@ var _ = Describe("deploy a an app with dot files", func() {
 				staticfile_contents = "host_dot_files: true\nroot: public"
 			})
 			It("hosts the dotfiles", func() {
-				Expect(app.Stdout.String()).To(ContainSubstring("Enabling hosting of dotfiles"))
+				Expect(app.Stdout()).To(ContainSubstring("Enabling hosting of dotfiles"))
 				Expect(app.GetBody("/.hidden.html")).To(ContainSubstring("Hello from a hidden file"))
 			})
 		})
@@ -71,7 +71,7 @@ var _ = Describe("deploy a an app with dot files", func() {
 				staticfile_contents = "host_dot_files: false"
 			})
 			It("does not host the dotfiles", func() {
-				Expect(app.Stdout.String()).ToNot(ContainSubstring("Enabling hosting of dotfiles"))
+				Expect(app.Stdout()).ToNot(ContainSubstring("Enabling hosting of dotfiles"))
 				Expect(app.GetBody("/.hidden.html")).To(ContainSubstring("404 Not Found"))
 			})
 		})
@@ -81,7 +81,7 @@ var _ = Describe("deploy a an app with dot files", func() {
 				staticfile_contents = "host_dot_files: false\nroot: public"
 			})
 			It("does not host the dotfiles", func() {
-				Expect(app.Stdout.String()).ToNot(ContainSubstring("Enabling hosting of dotfiles"))
+				Expect(app.Stdout()).ToNot(ContainSubstring("Enabling hosting of dotfiles"))
 				Expect(app.GetBody("/.hidden.html")).To(ContainSubstring("404 Not Found"))
 			})
 		})

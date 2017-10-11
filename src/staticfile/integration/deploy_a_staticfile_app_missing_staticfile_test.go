@@ -20,12 +20,12 @@ var _ = Describe("a staticfile app with no staticfile", func() {
 
 	BeforeEach(func() {
 		app = cutlass.New(filepath.Join(bpDir, "fixtures", "without_staticfile"))
-		app.Buildpacks = []string{"staticfile_buildpack"}
+		app.Buildpacks("staticfile_buildpack")
 	})
 
 	It("runs", func() {
 		PushAppAndConfirm(app)
 
-		Expect(app.Stdout.String()).ToNot(ContainSubstring("grep: Staticfile: No such file or directory"))
+		Expect(app.Stdout()).ToNot(ContainSubstring("grep: Staticfile: No such file or directory"))
 	})
 })

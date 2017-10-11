@@ -1,6 +1,7 @@
 package cutlass
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -29,16 +30,20 @@ func Get(app models.CfApp, path string, headers map[string]string) (string, map[
 		delete(headers, "user")
 		delete(headers, "password")
 	}
+	fmt.Println("Get 0:", req.URL)
 	resp, err := client.Do(req)
 	if err != nil {
+		fmt.Println("Get 1:", err)
 		return "", map[string][]string{}, err
 	}
 	defer resp.Body.Close()
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		fmt.Println("Get 2:", err)
 		return "", map[string][]string{}, err
 	}
 	resp.Header["StatusCode"] = []string{strconv.Itoa(resp.StatusCode)}
+	fmt.Println("Get 3:", string(data), resp.Header, err)
 	return string(data), resp.Header, err
 }
 func GetBody(app models.CfApp, path string) (string, error) {
