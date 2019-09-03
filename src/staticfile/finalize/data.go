@@ -78,6 +78,7 @@ http {
     server_name localhost;
 
     root <%= ENV["APP_ROOT"] %>/public;
+    index  index.html;
 
     {{if .ForceHTTPS}}
       set $updated_host $host;
@@ -102,14 +103,16 @@ http {
     {{end}}
 
 
-    location / {
-      {{if .PushState}}
-        if (!-e $request_filename) {
-          rewrite ^(.*)$ / break;
-        }
-      {{end}}
-
-        index index.html index.htm Default.htm;
+    location / {  
+      <% if ENV["PRERENDER_TOKEN"] && ENV["PRERENDER_TOKEN"].length > 0 %>
+        try_files $uri @prerender;
+      <% else %>
+        {{if .PushState}}
+          if (!-e $request_filename) {
+            rewrite ^(.*)$ / break;
+          }
+        {{end}}
+      <% end %>
 
       {{if .DirectoryIndex}}
         autoindex on;
@@ -136,6 +139,40 @@ http {
 			  error_page {{ $code }} {{ $value }};
 		  {{ end }}
     }
+
+    <% if ENV["PRERENDER_TOKEN"] && ENV["PRERENDER_TOKEN"].length > 0 %>
+    location @prerender {
+          proxy_set_header X-Prerender-Token <%= ENV["PRERENDER_TOKEN"] %>;
+	  
+	  set $prerender 0;
+          if ($http_user_agent ~* "googlebot|bingbot|yandex|baiduspider|Screaming Frog SEO Spider|twitterbot|facebookexternalhit|rogerbot|linkedinbot|embedly|quora link preview|showyoubot|outbrain|pinterest\/0\.|pinterestbot|slackbot|vkShare|W3C_Validator|whatsapp") {
+              set $prerender 1;
+          }
+          if ($args ~ "_escaped_fragment_") {
+              set $prerender 1;
+          }
+          if ($http_user_agent ~ "Prerender") {
+              set $prerender 0;
+          }
+          if ($uri ~* "\.(js|css|xml|less|png|jpg|jpeg|gif|pdf|doc|txt|ico|rss|zip|mp3|rar|exe|wmv|doc|avi|ppt|mpg|mpeg|tif|wav|mov|psd|ai|xls|mp4|m4a|swf|dat|dmg|iso|flv|m4v|torrent|ttf|woff|svg|eot)") {
+              set $prerender 0;
+          }
+
+          #resolve using Google's DNS server to force DNS resolution and prevent caching of IPs
+          resolver 8.8.8.8;
+
+          if ($prerender = 1) {
+              #setting prerender as a variable forces DNS resolution since nginx caches IPs and doesnt play well with load balancing
+              set $prerender "service.prerender.io";
+	      rewrite .* /https://$host$request_uri? break;
+              proxy_pass http://$prerender;
+          }
+
+          if ($prerender = 0) {
+              rewrite .* /index.html break;
+	  }
+    }
+    <% end %>
 
     {{if not .HostDotFiles}}
       location ~ /\. {
